@@ -582,6 +582,13 @@ export const MACHINE_STATUS_LABELS: Record<Machine['status'], string> = {
   scrapped: 'Dihapus',
 };
 
+export const MACHINE_STATUS_COLORS: Record<Machine['status'], string> = {
+  running: 'bg-green-100 text-green-800',
+  repairing: 'bg-orange-100 text-orange-800',
+  standby: 'bg-gray-100 text-gray-800',
+  scrapped: 'bg-red-100 text-red-800',
+};
+
 // ============================================================================
 // Health Score Helper
 // ============================================================================

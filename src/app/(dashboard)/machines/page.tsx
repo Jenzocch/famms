@@ -1,43 +1,96 @@
 import { createClient } from '@/lib/supabase/server'
-import { HardDrive } from 'lucide-react'
-import { MACHINE_STATUS_LABELS, Machine } from '@/types'
+import { redirect } from 'next/navigation'
+import Link from 'next/link'
+import { Plus, Edit2, Trash2, QrCode } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import StatusBadge from '@/components/shared/StatusBadge'
+
+export const metadata = { title: 'Mesin | FAMMS' }
 
 export default async function MachinesPage() {
   const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/login')
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('factory_id')
+    .eq('id', user.id)
+    .single()
+
   const { data: machines } = await supabase
     .from('machines')
-    .select('*, area:areas(name), factory:factories(name)')
+    .select('*, area:areas(name), owner:profiles(full_name)')
+    .eq('factory_id', profile?.factory_id)
     .order('machine_code')
-
-  const rows = (machines ?? []) as (Machine & { area: { name: string } | null; factory: { name: string } | null })[]
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-bold text-gray-900">Mesin</h1>
-      {rows.length === 0 ? (
-        <div className="text-center py-20 text-gray-400">
-          <HardDrive className="w-10 h-10 mx-auto mb-3" />
-          <p>Belum ada mesin. Jalankan <code className="text-xs">supabase/seed_demo.sql</code> untuk data contoh.</p>
+      <div className="flex items-center justify-between">
+        <h1 className="text-xl font-bold text-gray-900">Mesin</h1>
+        <Link href="/machines/new">
+          <Button>
+            <Plus className="w-4 h-4 mr-2" />
+            Tambah Mesin
+          </Button>
+        </Link>
+      </div>
+
+      {!machines || machines.length === 0 ? (
+        <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
+          <QrCode className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+          <p className="text-gray-500">Belum ada mesin terdaftar</p>
         </div>
       ) : (
-        <div className="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
-          {rows.map(m => (
-            <div key={m.id} className="flex items-center justify-between px-4 py-3">
-              <div>
-                <p className="font-mono text-sm font-semibold text-gray-900">{m.machine_code}</p>
+        <div className="space-y-2">
+          {machines.map((m) => (
+            <div key={m.id} className="bg-white rounded-lg border border-gray-200 p-4 flex items-center justify-between hover:border-blue-300 transition">
+              <div className="flex-1">
+                <div className="flex items-center gap-3 mb-1">
+                  <h3 className="font-semibold text-gray-900">{m.machine_code}</h3>
+                  <StatusBadge status={m.status} type="machine" />
+                </div>
                 <p className="text-sm text-gray-600">{m.machine_name}</p>
-                <p className="text-xs text-gray-400">
-                  {m.factory?.name} · {m.area?.name}
-                  {m.brand ? ` · ${m.brand}` : ''}{m.model ? ` ${m.model}` : ''}
-                </p>
+                <div className="flex gap-4 mt-2 text-xs text-gray-500">
+                  {m.brand && <span>{m.brand} {m.model}</span>}
+                  {m.area?.name && <span>{m.area.name}</span>}
+                  {m.owner?.full_name && <span>PIC: {m.owner.full_name}</span>}
+                </div>
               </div>
-              <span className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-600">
-                {MACHINE_STATUS_LABELS[m.status]}
-              </span>
+              <div className="flex gap-2">
+                <Link href={`/machines/${m.id}/qr`}>
+                  <Button variant="outline" size="sm">
+                    <QrCode className="w-4 h-4" />
+                  </Button>
+                </Link>
+                <Link href={`/machines/${m.id}/edit`}>
+                  <Button variant="outline" size="sm">
+                    <Edit2 className="w-4 h-4" />
+                  </Button>
+                </Link>
+                <DeleteMachineButton machineId={m.id} />
+              </div>
             </div>
           ))}
         </div>
       )}
     </div>
+  )
+}
+
+function DeleteMachineButton({ machineId }: { machineId: string }) {
+  return (
+    <form
+      action={async () => {
+        'use server'
+        const supabase = await createClient()
+        await supabase.from('machines').delete().eq('id', machineId)
+        redirect('/machines')
+      }}
+    >
+      <Button variant="outline" size="sm" type="submit" className="text-red-600 hover:bg-red-50">
+        <Trash2 className="w-4 h-4" />
+      </Button>
+    </form>
   )
 }
