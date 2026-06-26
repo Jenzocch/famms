@@ -9,9 +9,11 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select'
 import { toast } from 'sonner'
-import { Loader2, Plus, Wrench, Clock, CheckCircle } from 'lucide-react'
+import { Loader2, Plus, Wrench, Clock, CheckCircle, Settings } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import { zhTW } from 'date-fns/locale'
+import OverdueMaintenanceAlert from './OverdueMaintenanceAlert'
+import PMScheduleManager from './PMScheduleManager'
 
 interface Factory { id: string; name: string }
 interface Area { id: string; factory_id: string; name: string }
@@ -47,6 +49,7 @@ export default function PMPage() {
   const [notes, setNotes] = useState('')
   const [performer, setPerformer] = useState('')
   const [showForm, setShowForm] = useState(false)
+  const [showSchedules, setShowSchedules] = useState(false)
   const [submitting, setSubmitting] = useState(false)
 
   useEffect(() => {
@@ -138,10 +141,27 @@ export default function PMPage() {
           <h1 className="text-xl font-bold text-gray-900">保養紀錄</h1>
           <p className="text-sm text-gray-500 mt-1">追蹤機器保養頻率</p>
         </div>
-        <Button onClick={() => setShowForm(!showForm)} className="gap-2">
-          <Plus className="w-4 h-4" /> 新增保養
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={() => setShowSchedules(!showSchedules)} variant="outline" className="gap-2">
+            <Settings className="w-4 h-4" /> 保養計畫
+          </Button>
+          <Button onClick={() => setShowForm(!showForm)} className="gap-2">
+            <Plus className="w-4 h-4" /> 新增保養
+          </Button>
+        </div>
       </div>
+
+      {/* Overdue Alert */}
+      <div className="border-l-4 border-amber-500 bg-amber-50 rounded-lg p-4">
+        <OverdueMaintenanceAlert />
+      </div>
+
+      {/* PM Schedule Manager */}
+      {showSchedules && (
+        <div className="bg-green-50 border border-green-200 rounded-xl p-4">
+          <PMScheduleManager />
+        </div>
+      )}
 
       {/* Add Maintenance Form */}
       {showForm && (

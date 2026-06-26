@@ -2,8 +2,8 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { getCurrentUser, PERMISSIONS } from '@/lib/auth'
 import Link from 'next/link'
-import { AlertTriangle, Clock, Factory, ChevronRight, CheckCircle2 } from 'lucide-react'
-import { formatDistanceToNow } from 'date-fns'
+import { AlertTriangle, Clock, Factory, ChevronRight, CheckCircle2, Wrench } from 'lucide-react'
+import { formatDistanceToNow, addDays, addWeeks, addMonths } from 'date-fns'
 import { zhTW } from 'date-fns/locale'
 import { IncidentStatus } from '@/types'
 import { ISSUE_TYPE_LABELS, URGENCY_FROM_IMPACT, STATUS_ZH, STATUS_ZH_COLOR } from '@/lib/incident-display'
@@ -43,6 +43,57 @@ export default async function DashboardPage() {
 
   const rows = (data ?? []) as unknown as Row[]
   const open = rows.filter(r => OPEN_STATUSES.includes(r.status))
+
+  // Get overdue machines
+  const { data: schedules } = await supabase
+    .from('pm_schedules')
+    .select('machine_id, pm_type, machines(machine_name, machine_code)')
+    .eq('is_active', true)
+
+  const { data: logs } = await supabase
+    .from('maintenance_logs')
+    .select('machine_id, performed_at')
+    .order('performed_at', { ascending: false })
+
+  const lastByMachine: Record<string, string> = {}
+  if (logs) {
+    for (const log of logs) {
+      if (!lastByMachine[log.machine_id]) {
+        lastByMachine[log.machine_id] = log.performed_at
+      }
+    }
+  }
+
+  function getNextDueDate(lastMaintained: string | null, pmType: string): Date {
+    const base = lastMaintained ? new Date(lastMaintained) : new Date()
+    switch (pmType) {
+      case 'daily': return addDays(base, 1)
+      case 'weekly': return addWeeks(base, 1)
+      case 'monthly': return addMonths(base, 1)
+      case 'quarterly': return addMonths(base, 3)
+      case 'half_yearly': return addMonths(base, 6)
+      case 'yearly': return addMonths(base, 12)
+      default: return addMonths(base, 1)
+    }
+  }
+
+  const overdue = (schedules ?? [])
+    .filter(s => (s as any).machines)
+    .map(s => {
+      const lastMaintained = lastByMachine[s.machine_id]
+      const dueDate = getNextDueDate(lastMaintained, s.pm_type)
+      const daysOverdue = Math.floor((Date.now() - dueDate.getTime()) / 86400000)
+      return {
+        machine_id: s.machine_id,
+        machine_name: (s as any).machines.machine_name,
+        machine_code: (s as any).machines.machine_code,
+        pm_type: s.pm_type,
+        days_overdue: daysOverdue,
+      }
+    })
+    .filter(m => m.days_overdue > 0)
+    .sort((a, b) => b.days_overdue - a.days_overdue)
+    .slice(0, 10)
 
   // Open count per factory
   const byFactory = new Map<string, number>()
@@ -96,6 +147,31 @@ export default async function DashboardPage() {
       {/* Stale cases */}
       <Section icon={<Clock className="w-4 h-4 text-amber-500" />} title="逾 3 天未更新">
         {stale.length === 0 ? <Empty text="沒有逾時案件" /> : <CaseList rows={stale} />}
+      </Section>
+
+      {/* Overdue maintenance */}
+      <Section icon={<Wrench className="w-4 h-4 text-red-500" />} title="逾期未保養機器">
+        {overdue.length === 0 ? (
+          <Empty text="沒有逾期未保養的機器" />
+        ) : (
+          <div className="space-y-1.5">
+            {overdue.map(m => (
+              <div key={m.machine_id} className="bg-red-50 rounded-lg border border-red-200 px-3 py-2.5">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-700">
+                      {m.machine_code ? `[${m.machine_code}] ` : ''}{m.machine_name}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      保養頻率: {['daily', 'weekly', 'monthly', 'quarterly', 'half_yearly', 'yearly'].includes(m.pm_type) ? ['每日', '每週', '每月', '每季', '每半年', '每年'][['daily', 'weekly', 'monthly', 'quarterly', 'half_yearly', 'yearly'].indexOf(m.pm_type)] : m.pm_type}
+                    </p>
+                  </div>
+                  <p className="text-sm font-bold text-red-600">逾期 {m.days_overdue} 天</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </Section>
     </div>
   )
