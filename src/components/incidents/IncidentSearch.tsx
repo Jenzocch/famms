@@ -39,6 +39,10 @@ interface IncidentSearchProps {
   onResults?: (results: IncidentRow[]) => void
 }
 
+function safeGetLabel(map: Record<string, string>, key: string, fallback: string): string {
+  return key && key in map ? map[key] : fallback || key || '未知'
+}
+
 export default function IncidentSearch({ onResults }: IncidentSearchProps) {
   const supabase = createClient()
 
@@ -156,18 +160,26 @@ export default function IncidentSearch({ onResults }: IncidentSearchProps) {
     }
 
     try {
-      const exportData = results.map(r => ({
-        '案件號': r.incident_no,
-        '標題': r.title || ISSUE_TYPE_LABELS[r.incident_type] || '問題',
-        '類型': ISSUE_TYPE_LABELS[r.incident_type] || r.incident_type,
-        '狀態': STATUS_ZH[r.status as IncidentStatus] || r.status,
-        '緊急度': URGENCY_FROM_IMPACT[r.downtime_impact]?.label || r.downtime_impact,
-        '機器': r.machine ? `[${r.machine.machine_code || ''}] ${r.machine.machine_name}` : '',
-        '工廠': r.factory?.name || '',
-        '回報者': r.reporter_name || '',
-        '指派給': r.assigned_to || '',
-        '回報時間': new Date(r.reported_at).toLocaleString('zh-TW'),
-      }))
+      const exportData = results.map(r => {
+        const machineDisplay = r.machine
+          ? r.machine.machine_code
+            ? `[${r.machine.machine_code}] ${r.machine.machine_name}`
+            : r.machine.machine_name
+          : ''
+
+        return {
+          '案件號': r.incident_no,
+          '標題': r.title || safeGetLabel(ISSUE_TYPE_LABELS, r.incident_type, '問題'),
+          '類型': safeGetLabel(ISSUE_TYPE_LABELS, r.incident_type, r.incident_type),
+          '狀態': safeGetLabel(STATUS_ZH as any, r.status, r.status),
+          '緊急度': URGENCY_FROM_IMPACT[r.downtime_impact as any]?.label || r.downtime_impact,
+          '機器': machineDisplay,
+          '工廠': r.factory?.name || '',
+          '回報者': r.reporter_name || '',
+          '指派給': r.assigned_to || '',
+          '回報時間': new Date(r.reported_at).toLocaleString('zh-TW'),
+        }
+      })
 
       const ws = XLSX.utils.json_to_sheet(exportData)
       const wb = XLSX.utils.book_new()
@@ -371,7 +383,11 @@ export default function IncidentSearch({ onResults }: IncidentSearchProps) {
       {results.length > 0 && (
         <div className="space-y-2">
           {results.map(inc => {
-            const urgency = URGENCY_FROM_IMPACT[inc.downtime_impact]
+            const urgency = URGENCY_FROM_IMPACT[inc.downtime_impact as any]
+            const statusLabel = safeGetLabel(STATUS_ZH as any, inc.status, inc.status)
+            const statusColor = STATUS_ZH_COLOR[inc.status as IncidentStatus] || 'bg-gray-100 text-gray-700'
+            const typeLabel = safeGetLabel(ISSUE_TYPE_LABELS, inc.incident_type, inc.incident_type)
+
             return (
               <Link
                 key={inc.id}
@@ -379,8 +395,8 @@ export default function IncidentSearch({ onResults }: IncidentSearchProps) {
                 className="block bg-white rounded-xl border border-gray-200 p-3 active:bg-gray-50"
               >
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${STATUS_ZH_COLOR[inc.status as IncidentStatus]}`}>
-                    {STATUS_ZH[inc.status as IncidentStatus] || inc.status}
+                  <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${statusColor}`}>
+                    {statusLabel}
                   </span>
                   {urgency && (
                     <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${urgency.color}`}>
@@ -391,12 +407,12 @@ export default function IncidentSearch({ onResults }: IncidentSearchProps) {
                 </div>
 
                 <p className="font-medium text-gray-900 mt-2 line-clamp-1">
-                  {inc.title || ISSUE_TYPE_LABELS[inc.incident_type] || '問題'}
+                  {inc.title || typeLabel || '問題'}
                 </p>
 
                 <div className="flex items-center justify-between mt-1">
                   <p className="text-xs text-gray-500 truncate">
-                    {ISSUE_TYPE_LABELS[inc.incident_type] || inc.incident_type}
+                    {typeLabel}
                     {inc.factory ? ` · ${inc.factory.name}` : ''}
                     {inc.machine ? ` · ${inc.machine.machine_name}` : ''}
                   </p>
