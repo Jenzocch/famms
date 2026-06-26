@@ -107,8 +107,7 @@ CREATE TABLE machines (
   -- status: 'running' | 'repairing' | 'standby' | 'scrapped'
   remarks TEXT,
   created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP DEFAULT NOW(),
-  UNIQUE(factory_id, machine_code) WHERE machine_code IS NOT NULL
+  updated_at TIMESTAMP DEFAULT NOW()
 );
 
 CREATE TABLE machine_qr_codes (
@@ -140,8 +139,7 @@ CREATE TABLE facilities (
 
   remarks TEXT,
   created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP DEFAULT NOW(),
-  UNIQUE(factory_id, facility_code) WHERE facility_code IS NOT NULL
+  updated_at TIMESTAMP DEFAULT NOW()
 );
 
 -- ============================================================================
@@ -580,6 +578,10 @@ CREATE INDEX idx_incident_actions_incident_id ON incident_actions(incident_id);
 CREATE INDEX idx_pm_records_status_date ON pm_records(status, scheduled_date);
 CREATE INDEX idx_knowledge_base_keywords ON knowledge_base(keywords);
 CREATE INDEX idx_maintenance_costs_machine_date ON maintenance_costs(machine_id, cost_date);
+
+-- Partial unique indexes (machines and facilities only allow one null code per factory)
+CREATE UNIQUE INDEX idx_machines_factory_machine_code ON machines(factory_id, machine_code) WHERE machine_code IS NOT NULL;
+CREATE UNIQUE INDEX idx_facilities_factory_facility_code ON facilities(factory_id, facility_code) WHERE facility_code IS NOT NULL;
 
 -- ============================================================================
 -- RLS (ROW LEVEL SECURITY) — DISABLED FOR INITIAL SETUP
