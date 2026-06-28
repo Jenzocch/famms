@@ -5,6 +5,7 @@ import { LayoutGrid, Search } from 'lucide-react'
 import IncidentBoard, { BoardRow } from './IncidentBoard'
 import IncidentSearch from './IncidentSearch'
 import type { UserRole } from '@/types'
+import { useI18n } from '@/lib/i18n'
 
 interface IncidentsBoardWithSearchProps {
   rows: BoardRow[]
@@ -15,6 +16,7 @@ export default function IncidentsBoardWithSearch({
   rows,
   userRole = 'technician',
 }: IncidentsBoardWithSearchProps) {
+  const { t } = useI18n()
   const [view, setView] = useState<'board' | 'search'>('board')
 
   return (
@@ -30,7 +32,7 @@ export default function IncidentsBoardWithSearch({
           }`}
         >
           <LayoutGrid className="w-4 h-4" />
-          看板
+          {t('board.tabBoard')}
         </button>
         <button
           onClick={() => setView('search')}
@@ -41,7 +43,7 @@ export default function IncidentsBoardWithSearch({
           }`}
         >
           <Search className="w-4 h-4" />
-          搜索
+          {t('board.tabSearch')}
         </button>
       </div>
 
@@ -53,7 +55,7 @@ export default function IncidentsBoardWithSearch({
       {/* Search View */}
       {view === 'search' && (
         <div className="space-y-4">
-          <h2 className="text-sm text-gray-600">按日期範圍、機器、類型搜索案件</h2>
+          <h2 className="text-sm text-gray-600">{t('board.searchSubtitle')}</h2>
           <IncidentSearch />
         </div>
       )}

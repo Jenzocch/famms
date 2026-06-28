@@ -7,9 +7,10 @@ import { formatDistanceToNow } from 'date-fns'
 import { zhTW } from 'date-fns/locale'
 import type { IncidentStatus, UserRole } from '@/types'
 import {
-  ISSUE_TYPE_LABELS, URGENCY_FROM_IMPACT, STATUS_ZH, STATUS_ZH_COLOR, BOARD_FILTERS,
+  URGENCY_FROM_IMPACT, STATUS_ZH_COLOR, BOARD_FILTERS,
 } from '@/lib/incident-display'
 import { PERMISSIONS } from '@/lib/permissions'
+import { useI18n } from '@/lib/i18n'
 
 export interface BoardRow {
   id: string
@@ -32,6 +33,7 @@ interface IncidentBoardProps {
 }
 
 export default function IncidentBoard({ rows, userRole = 'technician' }: IncidentBoardProps) {
+  const { t } = useI18n()
   const [filter, setFilter] = useState('all')
   const canAssign = PERMISSIONS.assignIncident(userRole)
 
@@ -47,7 +49,7 @@ export default function IncidentBoard({ rows, userRole = 'technician' }: Inciden
 
   return (
     <div className="space-y-4">
-      <h1 className="text-xl font-bold text-gray-900">案件看板</h1>
+      <h1 className="text-xl font-bold text-gray-900">{t('board.heading')}</h1>
 
       {/* Filter tabs */}
       <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
@@ -62,7 +64,7 @@ export default function IncidentBoard({ rows, userRole = 'technician' }: Inciden
                 active ? 'bg-blue-600 text-white' : 'bg-white border border-gray-200 text-gray-600'
               }`}
             >
-              {f.label}
+              {t(`boardFilters.${f.key}`, f.label)}
               <span className={`ml-1 ${active ? 'text-blue-100' : 'text-gray-400'}`}>{n}</span>
             </button>
           )
@@ -73,7 +75,7 @@ export default function IncidentBoard({ rows, userRole = 'technician' }: Inciden
       {filtered.length === 0 ? (
         <div className="text-center py-16 text-gray-400">
           <AlertCircle className="w-10 h-10 mx-auto mb-2 opacity-30" />
-          <p className="text-sm">沒有案件</p>
+          <p className="text-sm">{t('board.noIncidents')}</p>
         </div>
       ) : (
         <div className="space-y-2">
@@ -87,21 +89,21 @@ export default function IncidentBoard({ rows, userRole = 'technician' }: Inciden
               >
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${STATUS_ZH_COLOR[inc.status]}`}>
-                    {STATUS_ZH[inc.status]}
+                    {t(`boardStatus.${inc.status}`)}
                   </span>
                   <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${urgency.color}`}>
-                    {urgency.label}
+                    {t(`urgency.${inc.downtime_impact}`, urgency.label)}
                   </span>
                   <span className="text-xs text-gray-400 font-mono ml-auto">{inc.incident_no}</span>
                 </div>
 
                 <p className="font-medium text-gray-900 mt-2 line-clamp-1">
-                  {inc.title || ISSUE_TYPE_LABELS[inc.incident_type] || '問題'}
+                  {inc.title || t(`issueTypes.${inc.incident_type}`, t('board.problem')) }
                 </p>
 
                 <div className="flex items-center justify-between mt-1">
                   <p className="text-xs text-gray-500 truncate">
-                    {ISSUE_TYPE_LABELS[inc.incident_type] || inc.incident_type}
+                    {t(`issueTypes.${inc.incident_type}`, inc.incident_type)}
                     {inc.factory ? ` · ${inc.factory.name}` : ''}
                     {inc.machine ? ` · ${inc.machine.machine_name}` : ''}
                   </p>
@@ -119,10 +121,10 @@ export default function IncidentBoard({ rows, userRole = 'technician' }: Inciden
                         <UserCheck className="w-3 h-3" /> {inc.assigned_to}
                       </span>
                     ) : canAssign ? (
-                      <span className="text-xs text-amber-600">未指派</span>
+                      <span className="text-xs text-amber-600">{t('board.unassigned')}</span>
                     ) : (
-                      <span className="inline-flex items-center gap-0.5 text-xs text-gray-400" title="只有主管可以派工">
-                        <Lock className="w-3 h-3" /> 未指派
+                      <span className="inline-flex items-center gap-0.5 text-xs text-gray-400" title={t('board.onlySupervisorAssign')}>
+                        <Lock className="w-3 h-3" /> {t('board.unassigned')}
                       </span>
                     )
                   )}

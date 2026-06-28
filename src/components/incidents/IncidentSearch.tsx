@@ -15,7 +15,8 @@ import { formatDistanceToNow } from 'date-fns'
 import { zhTW } from 'date-fns/locale'
 import * as XLSX from 'xlsx'
 import type { IncidentStatus } from '@/types'
-import { ISSUE_TYPE_LABELS, URGENCY_FROM_IMPACT, STATUS_ZH, STATUS_ZH_COLOR } from '@/lib/incident-display'
+import { ISSUE_TYPE_LABELS, URGENCY_FROM_IMPACT, STATUS_ZH_COLOR } from '@/lib/incident-display'
+import { useI18n } from '@/lib/i18n'
 
 interface Factory { id: string; name: string }
 interface Area { id: string; name: string }
@@ -39,12 +40,12 @@ interface IncidentSearchProps {
   onResults?: (results: IncidentRow[]) => void
 }
 
-function safeGetLabel(map: Record<string, string>, key: string, fallback: string): string {
-  return key && key in map ? map[key] : fallback || key || '未知'
-}
-
 export default function IncidentSearch({ onResults }: IncidentSearchProps) {
+  const { t } = useI18n()
   const supabase = createClient()
+  const typeLabelOf = (key: string, fallback?: string) =>
+    t(`issueTypes.${key}`, fallback ?? key ?? t('board.unknown'))
+  const statusLabelOf = (key: string) => t(`boardStatus.${key}`, key)
 
   const [factories, setFactories] = useState<Factory[]>([])
   const [areas, setAreas] = useState<Area[]>([])
@@ -145,9 +146,9 @@ export default function IncidentSearch({ onResults }: IncidentSearchProps) {
       setResults(mapped)
       setHasSearched(true)
       if (onResults) onResults(mapped)
-      toast.success(`找到 ${mapped.length} 件案件`)
+      toast.success(t('board.foundCount', `找到 ${mapped.length} 件案件`).replace('{count}', String(mapped.length)))
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : '搜索失敗')
+      toast.error(err instanceof Error ? err.message : t('board.searchFailed'))
     } finally {
       setLoading(false)
     }
@@ -155,7 +156,7 @@ export default function IncidentSearch({ onResults }: IncidentSearchProps) {
 
   async function exportToExcel() {
     if (results.length === 0) {
-      toast.error('沒有可導出的資料')
+      toast.error(t('board.noDataToExport'))
       return
     }
 
@@ -168,22 +169,22 @@ export default function IncidentSearch({ onResults }: IncidentSearchProps) {
           : ''
 
         return {
-          '案件號': r.incident_no,
-          '標題': r.title || safeGetLabel(ISSUE_TYPE_LABELS, r.incident_type, '問題'),
-          '類型': safeGetLabel(ISSUE_TYPE_LABELS, r.incident_type, r.incident_type),
-          '狀態': safeGetLabel(STATUS_ZH as any, r.status, r.status),
-          '緊急度': URGENCY_FROM_IMPACT[r.downtime_impact as any]?.label || r.downtime_impact,
-          '機器': machineDisplay,
-          '工廠': r.factory?.name || '',
-          '回報者': r.reporter_name || '',
-          '指派給': r.assigned_to || '',
-          '回報時間': new Date(r.reported_at).toLocaleString('zh-TW'),
+          [t('board.colIncidentNo')]: r.incident_no,
+          [t('board.colTitle')]: r.title || typeLabelOf(r.incident_type, t('board.problem')),
+          [t('board.colType')]: typeLabelOf(r.incident_type, r.incident_type),
+          [t('board.colStatus')]: statusLabelOf(r.status),
+          [t('board.colUrgency')]: t(`urgency.${r.downtime_impact}`, URGENCY_FROM_IMPACT[r.downtime_impact as any]?.label || r.downtime_impact),
+          [t('board.colMachine')]: machineDisplay,
+          [t('board.colFactory')]: r.factory?.name || '',
+          [t('board.colReporter')]: r.reporter_name || '',
+          [t('board.colAssignedTo')]: r.assigned_to || '',
+          [t('board.colReportedAt')]: new Date(r.reported_at).toLocaleString('zh-TW'),
         }
       })
 
       const ws = XLSX.utils.json_to_sheet(exportData)
       const wb = XLSX.utils.book_new()
-      XLSX.utils.book_append_sheet(wb, ws, '案件列表')
+      XLSX.utils.book_append_sheet(wb, ws, t('board.sheetName'))
 
       // Auto-size columns
       const columnWidths = [
@@ -201,9 +202,9 @@ export default function IncidentSearch({ onResults }: IncidentSearchProps) {
       ws['!cols'] = columnWidths
 
       XLSX.writeFile(wb, `incident-report-${new Date().toISOString().split('T')[0]}.xlsx`)
-      toast.success('已匯出 Excel 檔案')
+      toast.success(t('board.excelExported'))
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : '匯出失敗')
+      toast.error(err instanceof Error ? err.message : t('board.exportFailed'))
     }
   }
 
@@ -228,14 +229,14 @@ export default function IncidentSearch({ onResults }: IncidentSearchProps) {
       <div className="bg-white rounded-xl border border-gray-200 p-4 space-y-4">
         <div className="flex items-center gap-2 mb-3">
           <Search className="w-4 h-4 text-gray-600" />
-          <h3 className="font-semibold text-gray-900">案件搜索</h3>
+          <h3 className="font-semibold text-gray-900">{t('board.searchTitle')}</h3>
         </div>
 
         <div className="grid grid-cols-1 gap-3">
           {/* Date Range */}
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <Label className="text-xs">開始日期</Label>
+              <Label className="text-xs">{t('board.startDate')}</Label>
               <Input
                 type="date"
                 value={startDate}
@@ -244,7 +245,7 @@ export default function IncidentSearch({ onResults }: IncidentSearchProps) {
               />
             </div>
             <div>
-              <Label className="text-xs">結束日期</Label>
+              <Label className="text-xs">{t('board.endDate')}</Label>
               <Input
                 type="date"
                 value={endDate}
@@ -256,10 +257,10 @@ export default function IncidentSearch({ onResults }: IncidentSearchProps) {
 
           {/* Factory */}
           <div>
-            <Label className="text-xs">工廠</Label>
+            <Label className="text-xs">{t('board.factory')}</Label>
             <Select value={factoryId} onValueChange={(v) => setFactoryId(v ?? '')}>
               <SelectTrigger className="mt-1 text-sm">
-                <SelectValue placeholder="選擇工廠" />
+                <SelectValue placeholder={t('board.selectFactory')} />
               </SelectTrigger>
               <SelectContent>
                 {factories.map(f => (
@@ -272,10 +273,10 @@ export default function IncidentSearch({ onResults }: IncidentSearchProps) {
           {/* Area */}
           {areas.length > 0 && (
             <div>
-              <Label className="text-xs">區域</Label>
+              <Label className="text-xs">{t('board.area')}</Label>
               <Select value={areaId} onValueChange={(v) => setAreaId(v ?? '')}>
                 <SelectTrigger className="mt-1 text-sm">
-                  <SelectValue placeholder="選擇區域" />
+                  <SelectValue placeholder={t('board.selectArea')} />
                 </SelectTrigger>
                 <SelectContent>
                   {areas.map(a => (
@@ -289,10 +290,10 @@ export default function IncidentSearch({ onResults }: IncidentSearchProps) {
           {/* Machine */}
           {machines.length > 0 && (
             <div>
-              <Label className="text-xs">機器</Label>
+              <Label className="text-xs">{t('board.machine')}</Label>
               <Select value={machineId} onValueChange={(v) => setMachineId(v ?? '')}>
                 <SelectTrigger className="mt-1 text-sm">
-                  <SelectValue placeholder="選擇機器" />
+                  <SelectValue placeholder={t('board.selectMachine')} />
                 </SelectTrigger>
                 <SelectContent>
                   {machines.map(m => (
@@ -307,14 +308,14 @@ export default function IncidentSearch({ onResults }: IncidentSearchProps) {
 
           {/* Incident Type */}
           <div>
-            <Label className="text-xs">問題類型</Label>
+            <Label className="text-xs">{t('board.issueType')}</Label>
             <Select value={incidentType} onValueChange={(v) => setIncidentType(v ?? '')}>
               <SelectTrigger className="mt-1 text-sm">
-                <SelectValue placeholder="選擇類型" />
+                <SelectValue placeholder={t('board.selectType')} />
               </SelectTrigger>
               <SelectContent>
-                {Object.entries(ISSUE_TYPE_LABELS).map(([key, label]) => (
-                  <SelectItem key={key} value={key}>{label}</SelectItem>
+                {Object.keys(ISSUE_TYPE_LABELS).map((key) => (
+                  <SelectItem key={key} value={key}>{typeLabelOf(key)}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -322,15 +323,15 @@ export default function IncidentSearch({ onResults }: IncidentSearchProps) {
 
           {/* Status */}
           <div>
-            <Label className="text-xs">案件狀態</Label>
+            <Label className="text-xs">{t('board.statusLabel')}</Label>
             <Select value={status} onValueChange={(v) => setStatus(v ?? '')}>
               <SelectTrigger className="mt-1 text-sm">
-                <SelectValue placeholder="選擇狀態" />
+                <SelectValue placeholder={t('board.selectStatus')} />
               </SelectTrigger>
               <SelectContent>
                 {STATUSES.map(s => (
                   <SelectItem key={s} value={s}>
-                    {STATUS_ZH[s as IncidentStatus] || s}
+                    {statusLabelOf(s)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -346,7 +347,7 @@ export default function IncidentSearch({ onResults }: IncidentSearchProps) {
             className="flex-1 gap-2"
           >
             <Search className="w-4 h-4" />
-            {loading ? '搜索中...' : '搜索'}
+            {loading ? t('board.searching') : t('board.searchBtn')}
           </Button>
           {hasFilters && (
             <Button
@@ -355,7 +356,7 @@ export default function IncidentSearch({ onResults }: IncidentSearchProps) {
               className="gap-2"
             >
               <X className="w-4 h-4" />
-              重設
+              {t('board.reset')}
             </Button>
           )}
         </div>
@@ -365,7 +366,13 @@ export default function IncidentSearch({ onResults }: IncidentSearchProps) {
       {results.length > 0 && (
         <div className="flex items-center justify-between gap-2">
           <p className="text-sm text-gray-600">
-            找到 <span className="font-semibold text-blue-600">{results.length}</span> 件案件
+            {t('board.foundCount', `找到 ${results.length} 件案件`)
+              .split('{count}')
+              .flatMap((part, i) =>
+                i === 0
+                  ? [part]
+                  : [<span key={i} className="font-semibold text-blue-600">{results.length}</span>, part]
+              )}
           </p>
           <Button
             onClick={exportToExcel}
@@ -374,7 +381,7 @@ export default function IncidentSearch({ onResults }: IncidentSearchProps) {
             className="gap-2 text-green-600 border-green-300"
           >
             <Download className="w-4 h-4" />
-            匯出 Excel
+            {t('board.exportExcel')}
           </Button>
         </div>
       )}
@@ -384,9 +391,9 @@ export default function IncidentSearch({ onResults }: IncidentSearchProps) {
         <div className="space-y-2">
           {results.map(inc => {
             const urgency = URGENCY_FROM_IMPACT[inc.downtime_impact as any]
-            const statusLabel = safeGetLabel(STATUS_ZH as any, inc.status, inc.status)
+            const statusLabel = statusLabelOf(inc.status)
             const statusColor = STATUS_ZH_COLOR[inc.status as IncidentStatus] || 'bg-gray-100 text-gray-700'
-            const typeLabel = safeGetLabel(ISSUE_TYPE_LABELS, inc.incident_type, inc.incident_type)
+            const typeLabel = typeLabelOf(inc.incident_type, inc.incident_type)
 
             return (
               <Link
@@ -400,14 +407,14 @@ export default function IncidentSearch({ onResults }: IncidentSearchProps) {
                   </span>
                   {urgency && (
                     <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${urgency.color}`}>
-                      {urgency.label}
+                      {t(`urgency.${inc.downtime_impact}`, urgency.label)}
                     </span>
                   )}
                   <span className="text-xs text-gray-400 font-mono ml-auto">{inc.incident_no}</span>
                 </div>
 
                 <p className="font-medium text-gray-900 mt-2 line-clamp-1">
-                  {inc.title || typeLabel || '問題'}
+                  {inc.title || typeLabel || t('board.problem')}
                 </p>
 
                 <div className="flex items-center justify-between mt-1">
@@ -433,7 +440,7 @@ export default function IncidentSearch({ onResults }: IncidentSearchProps) {
       {hasSearched && results.length === 0 && !loading && (
         <div className="text-center py-12 text-gray-400">
           <AlertCircle className="w-10 h-10 mx-auto mb-2 opacity-30" />
-          <p className="text-sm">沒有符合條件的案件</p>
+          <p className="text-sm">{t('board.noMatch')}</p>
         </div>
       )}
     </div>
