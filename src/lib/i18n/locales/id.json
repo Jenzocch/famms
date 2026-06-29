@@ -307,6 +307,7 @@
     "details": "Detail Mesin",
     "history": "Riwayat",
     "selectFactory": "Pilih Pabrik",
+    "allFactories": "Semua pabrik (lintas pabrik)",
     "selectArea": "Pilih Area",
     "selectMachine": "Pilih Mesin",
     "issueType": "Jenis Masalah"

@@ -308,6 +308,7 @@
     "details": "Machine Details",
     "history": "History",
     "selectFactory": "Select Factory",
+    "allFactories": "All factories (cross-factory)",
     "selectArea": "Select Area",
     "selectMachine": "Select Machine",
     "issueType": "Issue Type"

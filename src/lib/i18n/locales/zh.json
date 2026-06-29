@@ -307,6 +307,7 @@
     "details": "机器详情",
     "history": "历史",
     "selectFactory": "选择工厂",
+    "allFactories": "全部工厂（跨厂）",
     "selectArea": "选择区域",
     "selectMachine": "选择机器",
     "issueType": "问题类型"
