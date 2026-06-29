@@ -32,7 +32,7 @@ export const PERMISSIONS = {
   // --- Preventive maintenance ---
   // Technicians execute PM tasks; managers + admins also manage PM schedules.
   viewPM: (_role: UserRole) => true,
-  managePMSchedules: (role: UserRole) => ['manager', 'admin'].includes(role),
+  managePMSchedules: (role: UserRole) => role === 'admin',
 
   // --- Equipment master ---
   viewMachines: (_role: UserRole) => true,
