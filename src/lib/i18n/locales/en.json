@@ -609,5 +609,21 @@
     "testing": "Testing",
     "observation": "Awaiting Confirmation",
     "closed": "Closed"
+  },
+  "settings": {
+    "userSectionTitle": "User Management",
+    "userSectionDesc": "Create accounts, edit roles, reset passwords",
+    "assetSectionTitle": "Machine Assets",
+    "assetSectionDesc": "Add machines, edit status",
+    "areaSectionTitle": "Area Management",
+    "areaSectionDesc": "Add production areas, packing zones, etc.",
+    "factorySectionTitle": "Factory Management",
+    "factorySectionDesc": "Add factories",
+    "incidentTypeSectionTitle": "Incident Type Management",
+    "incidentTypeSectionDesc": "Add custom issue types",
+    "pmSectionTitle": "PM Schedules",
+    "pmSectionDesc": "Add preventive maintenance plans",
+    "telegramSectionTitle": "Telegram Notifications",
+    "telegramSectionDesc": "Configure bot token to receive incident alerts"
   }
 }

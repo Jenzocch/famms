@@ -608,5 +608,21 @@
     "testing": "Pengujian",
     "observation": "Menunggu Konfirmasi",
     "closed": "Selesai"
+  },
+  "settings": {
+    "userSectionTitle": "Manajemen Pengguna",
+    "userSectionDesc": "Buat akun, ubah peran, atur ulang kata sandi",
+    "assetSectionTitle": "Aset Mesin",
+    "assetSectionDesc": "Tambah mesin, ubah status",
+    "areaSectionTitle": "Manajemen Area",
+    "areaSectionDesc": "Tambah area produksi, zona pengemasan, dll.",
+    "factorySectionTitle": "Manajemen Pabrik",
+    "factorySectionDesc": "Tambah pabrik",
+    "incidentTypeSectionTitle": "Manajemen Tipe Insiden",
+    "incidentTypeSectionDesc": "Tambah tipe masalah kustom",
+    "pmSectionTitle": "Jadwal PM",
+    "pmSectionDesc": "Tambah rencana pemeliharaan preventif",
+    "telegramSectionTitle": "Notifikasi Telegram",
+    "telegramSectionDesc": "Konfigurasi token bot untuk menerima peringatan insiden"
   }
 }

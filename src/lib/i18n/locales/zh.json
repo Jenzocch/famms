@@ -608,5 +608,21 @@
     "testing": "測試中",
     "observation": "待現場確認",
     "closed": "已結案"
+  },
+  "settings": {
+    "userSectionTitle": "使用者管理",
+    "userSectionDesc": "新增帳號、編輯角色、密碼重設",
+    "assetSectionTitle": "機器資產",
+    "assetSectionDesc": "新增機器、編輯狀態",
+    "areaSectionTitle": "區域管理",
+    "areaSectionDesc": "新增生產區、包裝區等工作區域",
+    "factorySectionTitle": "工廠管理",
+    "factorySectionDesc": "新增工廠",
+    "incidentTypeSectionTitle": "問題類型管理",
+    "incidentTypeSectionDesc": "新增自訂問題類型",
+    "pmSectionTitle": "保養計畫",
+    "pmSectionDesc": "新增定期保養排程",
+    "telegramSectionTitle": "Telegram 通知",
+    "telegramSectionDesc": "設定機器人 token，接收案件警報"
   }
 }
