@@ -17,13 +17,41 @@
 -- ============================================================================
 -- 1. MISSING TABLES & COLUMNS
 -- ============================================================================
+-- Older live DBs are missing many incidents columns (incident_type, status,
+-- downtime_impact, etc.) — this was the real cause of "送出失敗". Ensure every
+-- column the app uses exists.
+ALTER TABLE incidents ADD COLUMN IF NOT EXISTS incident_type TEXT;
+ALTER TABLE incidents ADD COLUMN IF NOT EXISTS machine_id UUID;
+ALTER TABLE incidents ADD COLUMN IF NOT EXISTS facility_id UUID;
+ALTER TABLE incidents ADD COLUMN IF NOT EXISTS incident_no TEXT;
 ALTER TABLE incidents ADD COLUMN IF NOT EXISTS title TEXT;
 ALTER TABLE incidents ADD COLUMN IF NOT EXISTS description TEXT;
 ALTER TABLE incidents ADD COLUMN IF NOT EXISTS reporter_name TEXT;
+ALTER TABLE incidents ADD COLUMN IF NOT EXISTS failure_code_id UUID;
+ALTER TABLE incidents ADD COLUMN IF NOT EXISTS facility_issue_description TEXT;
+ALTER TABLE incidents ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'reported';
+ALTER TABLE incidents ADD COLUMN IF NOT EXISTS downtime_impact TEXT DEFAULT 'D';
+ALTER TABLE incidents ADD COLUMN IF NOT EXISTS reported_at TIMESTAMP DEFAULT NOW();
+ALTER TABLE incidents ADD COLUMN IF NOT EXISTS reported_by_id UUID;
+ALTER TABLE incidents ADD COLUMN IF NOT EXISTS accepted_at TIMESTAMP;
+ALTER TABLE incidents ADD COLUMN IF NOT EXISTS accepted_by_id UUID;
+ALTER TABLE incidents ADD COLUMN IF NOT EXISTS root_cause TEXT;
+ALTER TABLE incidents ADD COLUMN IF NOT EXISTS completion_type TEXT;
+ALTER TABLE incidents ADD COLUMN IF NOT EXISTS observation_period INTEGER DEFAULT 0;
+ALTER TABLE incidents ADD COLUMN IF NOT EXISTS observation_end_date DATE;
+ALTER TABLE incidents ADD COLUMN IF NOT EXISTS closed_at TIMESTAMP;
+ALTER TABLE incidents ADD COLUMN IF NOT EXISTS closed_by_id UUID;
+ALTER TABLE incidents ADD COLUMN IF NOT EXISTS remarks TEXT;
+ALTER TABLE incidents ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT NOW();
+ALTER TABLE incidents ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT NOW();
 ALTER TABLE incidents ADD COLUMN IF NOT EXISTS assigned_to TEXT;
 ALTER TABLE incidents ADD COLUMN IF NOT EXISTS assigned_dept TEXT;
 ALTER TABLE incidents ADD COLUMN IF NOT EXISTS due_date DATE;
+
+-- These may have been created NOT NULL on old schemas — relax them so the
+-- simplified report form (no failure_code / facility) can insert.
 ALTER TABLE incidents ALTER COLUMN failure_code_id DROP NOT NULL;
+ALTER TABLE incidents ALTER COLUMN incident_type   DROP NOT NULL;
 
 ALTER TABLE machines ADD COLUMN IF NOT EXISTS asset_category TEXT DEFAULT 'machine';
 ALTER TABLE pm_schedules ADD COLUMN IF NOT EXISTS interval_days INTEGER;
