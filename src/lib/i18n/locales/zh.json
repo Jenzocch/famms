@@ -32,6 +32,7 @@
   },
   "remind": {
     "button": "催進度（Telegram 通知負責人）",
+    "cardButton": "催進度",
     "sent": "已透過 Telegram 催進度（{count} 位接收者）",
     "noRecipients": "已送出，但目前沒有訂閱的 Telegram 接收者",
     "failed": "催進度發送失敗"
@@ -608,10 +609,10 @@
     "other": "📋 其他"
   },
   "urgency": {
-    "A": "🔴 緊急 — 全廠停工",
-    "B": "🟠 高 — 生產線停止",
-    "C": "🟡 中 — 產能下降",
-    "D": "🟢 低 — 不影響產能"
+    "A": "🔴 全廠停工",
+    "B": "🟠 產線停止",
+    "C": "🟡 產能下降",
+    "D": "🟢 不影響"
   },
   "boardFilters": {
     "all": "全部",

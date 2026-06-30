@@ -32,6 +32,7 @@
   },
   "remind": {
     "button": "Ingatkan Progres (notifikasi Telegram)",
+    "cardButton": "Ingatkan",
     "sent": "Pengingat dikirim via Telegram ({count} penerima)",
     "noRecipients": "Terkirim, tetapi belum ada penerima Telegram yang berlangganan",
     "failed": "Gagal mengirim pengingat"
@@ -608,10 +609,10 @@
     "other": "📋 Lainnya"
   },
   "urgency": {
-    "A": "🔴 Kritis — Pabrik Berhenti",
-    "B": "🟠 Tinggi — Line Berhenti",
-    "C": "🟡 Sedang — Kapasitas Turun",
-    "D": "🟢 Rendah — Tidak Berpengaruh"
+    "A": "🔴 Pabrik Berhenti",
+    "B": "🟠 Line Berhenti",
+    "C": "🟡 Kapasitas Turun",
+    "D": "🟢 Tidak Berpengaruh"
   },
   "boardFilters": {
     "all": "Semua",

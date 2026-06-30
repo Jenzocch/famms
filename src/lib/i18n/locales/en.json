@@ -32,6 +32,7 @@
   },
   "remind": {
     "button": "Nudge for Progress (Telegram)",
+    "cardButton": "Nudge",
     "sent": "Reminder sent via Telegram ({count} recipients)",
     "noRecipients": "Sent, but no subscribed Telegram recipients yet",
     "failed": "Failed to send reminder"
@@ -609,10 +610,10 @@
     "other": "📋 Other"
   },
   "urgency": {
-    "A": "🔴 Critical — Factory Stopped",
-    "B": "🟠 High — Line Stopped",
-    "C": "🟡 Medium — Reduced Capacity",
-    "D": "🟢 Low — No Impact"
+    "A": "🔴 Factory Stopped",
+    "B": "🟠 Line Stopped",
+    "C": "🟡 Reduced Capacity",
+    "D": "🟢 No Impact"
   },
   "boardFilters": {
     "all": "All",

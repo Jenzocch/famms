@@ -22,11 +22,13 @@ export const ISSUE_TYPE_LABELS: Record<string, string> = {
   other: '📋 其他',
 }
 
-export const URGENCY_FROM_IMPACT: Record<string, { label: string; desc: string; color: string }> = {
-  A: { label: '🔴 緊急', desc: '全廠停工', color: 'bg-red-100 text-red-700' },
-  B: { label: '🟠 高', desc: '生產線停止', color: 'bg-orange-100 text-orange-700' },
-  C: { label: '🟡 中', desc: '產能下降', color: 'bg-yellow-100 text-yellow-700' },
-  D: { label: '🟢 低', desc: '不影響產能', color: 'bg-green-100 text-green-700' },
+// Label says the production impact in plain words (no abstract A/B/C/D codes),
+// short enough to fit a board card chip.
+export const URGENCY_FROM_IMPACT: Record<string, { label: string; color: string }> = {
+  A: { label: '🔴 全廠停工', color: 'bg-red-100 text-red-700' },
+  B: { label: '🟠 產線停止', color: 'bg-orange-100 text-orange-700' },
+  C: { label: '🟡 產能下降', color: 'bg-yellow-100 text-yellow-700' },
+  D: { label: '🟢 不影響', color: 'bg-green-100 text-green-700' },
 }
 
 // SLA: how many days until a case is due, based on its urgency (downtime_impact).

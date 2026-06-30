@@ -2,9 +2,10 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { AlertCircle, ChevronRight, UserCheck, Lock, CalendarClock } from 'lucide-react'
+import { AlertCircle, ChevronRight, UserCheck, Lock, CalendarClock, BellRing, Loader2 } from 'lucide-react'
 import { formatDistanceToNow, format } from 'date-fns'
 import { zhTW, enUS, id as idLocale } from 'date-fns/locale'
+import { toast } from 'sonner'
 import type { IncidentStatus, UserRole } from '@/types'
 import {
   URGENCY_FROM_IMPACT, STATUS_ZH_COLOR, BOARD_FILTERS,
@@ -39,6 +40,31 @@ export default function IncidentBoard({ rows, userRole = 'technician' }: Inciden
   const typeLabel = useIncidentTypeLabel()
   const [filter, setFilter] = useState('all')
   const canAssign = PERMISSIONS.assignIncident(userRole)
+  const canRemind = PERMISSIONS.remindProgress(userRole)
+  const [remindingId, setRemindingId] = useState<string | null>(null)
+
+  // Nudge assignees via Telegram straight from the card — no need to open the
+  // case. preventDefault/stopPropagation so the click doesn't follow the card's
+  // <Link> to the detail page.
+  async function remind(e: React.MouseEvent, id: string) {
+    e.preventDefault()
+    e.stopPropagation()
+    setRemindingId(id)
+    try {
+      const res = await fetch(`/api/incidents/${id}/remind`, { method: 'POST' })
+      const json = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(json?.error || t('remind.failed', '催進度發送失敗'))
+      if ((json.sent ?? 0) === 0) {
+        toast.warning(t('remind.noRecipients', '已送出，但目前沒有訂閱的 Telegram 接收者'))
+      } else {
+        toast.success(t('remind.sent', '已透過 Telegram 催進度（{count} 位接收者）').replace('{count}', String(json.sent)))
+      }
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : t('remind.failed', '催進度發送失敗'))
+    } finally {
+      setRemindingId(null)
+    }
+  }
 
   const activeFilter = BOARD_FILTERS.find(f => f.key === filter)!
   const filtered = activeFilter.statuses
@@ -157,6 +183,22 @@ export default function IncidentBoard({ rows, userRole = 'technician' }: Inciden
                     )
                   )}
                 </div>
+
+                {/* Nudge for progress — supervisors+ only, open cases only */}
+                {canRemind && inc.status !== 'closed' && (
+                  <div className="mt-2 flex justify-end">
+                    <button
+                      onClick={(e) => remind(e, inc.id)}
+                      disabled={remindingId === inc.id}
+                      className="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full border border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100 transition disabled:opacity-50"
+                    >
+                      {remindingId === inc.id
+                        ? <Loader2 className="w-3 h-3 animate-spin" />
+                        : <BellRing className="w-3 h-3" />}
+                      {t('remind.cardButton', '催進度')}
+                    </button>
+                  </div>
+                )}
               </Link>
             )
           })}
