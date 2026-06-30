@@ -129,8 +129,9 @@ export default async function IncidentDetailPage({
         )}
       </div>
 
-      {/* "What to do next" guidance for the current status */}
-      <NextStepHint status={status} />
+      {/* "What to do next" guidance — forward steps only; closed cases are
+          covered by the ClosedBanner below (avoids a duplicate green banner). */}
+      {!isClosed && <NextStepHint status={status} />}
 
       {/* Progress timeline (client component → labels follow app language) */}
       <ProgressTimeline
