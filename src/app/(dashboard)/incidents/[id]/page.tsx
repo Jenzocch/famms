@@ -146,19 +146,18 @@ export default async function IncidentDetailPage({
         <ClosedBanner closedAt={incident.closed_at} />
       )}
 
-      {/* Assignment (派工) */}
-      {!isClosed && (
-        <AssignForm
-          incidentId={id}
-          assignedTo={incident.assigned_to}
-          assignedDept={incident.assigned_dept}
-          assignedUserIds={incident.assigned_user_ids}
-          dueDate={incident.due_date}
-          factoryId={incident.factory_id}
-          userRole={user?.role}
-          userName={user?.full_name}
-        />
-      )}
+      {/* Assignment (派工) — available even after close so a case can be
+          re-routed to whoever follow-up work belongs to. */}
+      <AssignForm
+        incidentId={id}
+        assignedTo={incident.assigned_to}
+        assignedDept={incident.assigned_dept}
+        assignedUserIds={incident.assigned_user_ids}
+        dueDate={incident.due_date}
+        factoryId={incident.factory_id}
+        userRole={user?.role}
+        userName={user?.full_name}
+      />
 
       {/* Edit / Delete */}
       <IncidentActions

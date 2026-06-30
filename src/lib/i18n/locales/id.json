@@ -50,7 +50,7 @@
     "dueDate": "Tenggat waktu",
     "dueDateHint": "Kosongkan untuk dihitung otomatis dari urgensi (Kritis=hari ini, Tinggi=1h, Sedang=3h, Rendah=7h)",
     "location": "Lokasi",
-    "selectFactory": "Pilih pabrik *",
+    "selectFactory": "Pilih pabrik",
     "selectArea": "Pilih area (opsional)",
     "selectMachine": "Pilih mesin/item (opsional)",
     "problemTitle": "Judul Masalah",

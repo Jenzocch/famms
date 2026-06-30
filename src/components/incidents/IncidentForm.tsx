@@ -244,15 +244,20 @@ export default function IncidentForm() {
   }
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 lg:space-y-6">
       <div>
-        <h1 className="text-xl font-bold text-gray-900">{t('report.title')}</h1>
-        <p className="text-sm text-gray-500 mt-1">{t('report.subtitle')}</p>
+        <h1 className="text-2xl font-bold text-gray-900">{t('report.title')}</h1>
+        <p className="text-base text-gray-500 mt-1">{t('report.subtitle')}</p>
       </div>
 
+      {/* Two-column on desktop so the form uses the horizontal space instead of
+          a single narrow stack; collapses to one column on mobile. */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-x-6 gap-y-5 lg:items-start">
+      {/* ---- Left column ---- */}
+      <div className="space-y-5">
       {/* Reporter — pick a registered account or type a name manually */}
       <div>
-        <Label>{t('report.reporterName')}</Label>
+        <Label className="text-base">{t('report.reporterName')}</Label>
         {accounts.length > 0 && (
           <Select
             value={reporterAccountId}
@@ -288,14 +293,14 @@ export default function IncidentForm() {
 
       {/* Issue Type */}
       <div>
-        <Label>{t('report.issueType')} <span className="text-red-500">*</span></Label>
+        <Label className="text-base">{t('report.issueType')} <span className="text-red-500">*</span></Label>
         <div className="grid grid-cols-2 gap-2 mt-1">
           {issueTypes.map(t => (
             <button
               key={t.value}
               type="button"
               onClick={() => setIssueType(t.value)}
-              className={`text-left rounded-lg border px-3 py-2 text-sm font-medium transition-colors ${
+              className={`text-left rounded-lg border px-3 py-2.5 text-base font-medium transition-colors ${
                 issueType === t.value
                   ? 'border-blue-500 bg-blue-50 text-blue-700'
                   : 'border-gray-200 bg-white text-gray-700'
@@ -317,7 +322,7 @@ export default function IncidentForm() {
 
       {/* Urgency — compact single row (4 levels) */}
       <div>
-        <Label>{t('report.urgency')} <span className="text-red-500">*</span></Label>
+        <Label className="text-base">{t('report.urgency')} <span className="text-red-500">*</span></Label>
         <div className="grid grid-cols-3 gap-1.5 mt-1">
           {URGENCY.map(u => (
             <button
@@ -325,7 +330,7 @@ export default function IncidentForm() {
               type="button"
               onClick={() => setUrgency(u.value)}
               title={t(u.descKey)}
-              className={`rounded-lg border px-1 py-1.5 text-xs font-medium text-center transition-colors ${
+              className={`rounded-lg border px-1 py-2 text-sm font-medium text-center transition-colors ${
                 urgency === u.value
                   ? 'border-blue-500 bg-blue-50 text-blue-700'
                   : 'border-gray-200 bg-white text-gray-700'
@@ -339,7 +344,7 @@ export default function IncidentForm() {
 
       {/* Deadline (optional — auto-derived from urgency if left empty) */}
       <div>
-        <Label>{t('report.dueDate', '截止日')}</Label>
+        <Label className="text-base">{t('report.dueDate', '截止日')}</Label>
         <Input
           type="date"
           value={dueDate}
@@ -350,10 +355,13 @@ export default function IncidentForm() {
           {t('report.dueDateHint', '留空則依緊急程度自動計算（緊急=當天、高=1天、中=3天、低=7天）')}
         </p>
       </div>
+      </div>
+      {/* ---- Right column ---- */}
+      <div className="space-y-5">
 
-      {/* Location */}
+      {/* Location (required) */}
       <div className="space-y-3">
-        <Label>{t('report.location')}</Label>
+        <Label className="text-base">{t('report.location')} <span className="text-red-500">*</span></Label>
         <Select value={factoryId} onValueChange={(v) => setFactoryId(v ?? '')} items={Object.fromEntries(factories.map(f => [f.id, f.name]))}>
           <SelectTrigger><SelectValue placeholder={t('report.selectFactory')} /></SelectTrigger>
           <SelectContent>
@@ -398,7 +406,7 @@ export default function IncidentForm() {
 
       {/* Title */}
       <div>
-        <Label>{t('report.problemTitle')} <span className="text-red-500">*</span></Label>
+        <Label className="text-base">{t('report.problemTitle')} <span className="text-red-500">*</span></Label>
         <Input
           value={title}
           onChange={e => setTitle(e.target.value)}
@@ -409,7 +417,7 @@ export default function IncidentForm() {
 
       {/* Description */}
       <div>
-        <Label>{t('report.problemDesc')} <span className="text-red-500">*</span></Label>
+        <Label className="text-base">{t('report.problemDesc')} <span className="text-red-500">*</span></Label>
         <Textarea
           value={description}
           onChange={e => setDescription(e.target.value)}
@@ -418,10 +426,13 @@ export default function IncidentForm() {
           rows={4}
         />
       </div>
+      </div>
+      {/* ---- End two-column grid ---- */}
+      </div>
 
-      {/* Photos */}
+      {/* Photos (full width) */}
       <div>
-        <Label>{t('report.photos')}</Label>
+        <Label className="text-base">{t('report.photos')}</Label>
         <div className="mt-1 space-y-2">
           {photos.length > 0 && (
             <div className="flex flex-wrap gap-2">
