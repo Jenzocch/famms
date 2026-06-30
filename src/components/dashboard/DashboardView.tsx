@@ -8,6 +8,7 @@ import { IncidentStatus } from '@/types'
 import { URGENCY_FROM_IMPACT, STATUS_ZH, STATUS_ZH_COLOR } from '@/lib/incident-display'
 import { useI18n } from '@/lib/i18n'
 import { useIncidentTypeLabel } from '@/lib/incident-type-label'
+import NextStepHint from '@/components/incidents/NextStepHint'
 
 export interface DashboardRow {
   id: string
@@ -190,6 +191,11 @@ function CaseList({
             <p className="text-xs text-gray-400 mt-0.5">
               {r.factory?.name || ''} · {formatDistanceToNow(new Date(r.updated_at), { addSuffix: true, locale: dateLocale })}
             </p>
+            {r.status !== 'closed' && (
+              <div className="mt-1.5 pt-1.5 border-t border-gray-100">
+                <NextStepHint status={r.status} variant="inline" />
+              </div>
+            )}
           </Link>
         )
       })}
