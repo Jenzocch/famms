@@ -509,7 +509,10 @@
     "allFactories": "All factories (cross-factory)",
     "selectArea": "Select Area",
     "selectMachine": "Select Machine",
-    "issueType": "Issue Type"
+    "issueType": "Issue Type",
+    "addBtn": "Add Machine",
+    "empty": "No machines registered yet",
+    "confirmDelete": "Delete this machine?"
   },
   "dashboard": {
     "title": "Dashboard",

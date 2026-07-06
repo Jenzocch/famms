@@ -509,7 +509,10 @@
     "allFactories": "Semua pabrik (lintas pabrik)",
     "selectArea": "Pilih Area",
     "selectMachine": "Pilih Mesin",
-    "issueType": "Jenis Masalah"
+    "issueType": "Jenis Masalah",
+    "addBtn": "Tambah Mesin",
+    "empty": "Belum ada mesin terdaftar",
+    "confirmDelete": "Hapus mesin ini?"
   },
   "dashboard": {
     "title": "Dashboard",
