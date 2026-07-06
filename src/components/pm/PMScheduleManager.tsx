@@ -12,6 +12,7 @@ import { Loader2, Plus, Trash2, Edit2, Users, Check, X } from 'lucide-react'
 import { useI18n } from '@/lib/i18n'
 import type { UserRole } from '@/types'
 import { ROLE_ZH } from '@/lib/incident-display'
+import { loadMyFactoryId } from '@/lib/useMyFactory'
 
 interface Factory { id: string; name: string }
 interface Area { id: string; factory_id: string; name: string }
@@ -79,9 +80,16 @@ export default function PMScheduleManager() {
   const [editingId, setEditingId] = useState<string | null>(null)
 
   useEffect(() => {
-    supabase.from('factories').select('*').order('name').then(({ data }) => {
+    Promise.all([
+      supabase.from('factories').select('*').order('name'),
+      loadMyFactoryId(),
+    ]).then(([{ data }, myFactoryId]) => {
       setFactories(data ?? [])
-      if (data && data.length > 0) setFactoryId(data[0].id)
+      if (data && data.length > 0) {
+        // Preselect the user's own factory so technicians see their machines.
+        const preferred = myFactoryId && data.some(f => f.id === myFactoryId) ? myFactoryId : data[0].id
+        setFactoryId(preferred)
+      }
       setLoading(false)
     })
     supabase.from('profiles').select('id, full_name, role, factory_id').eq('is_active', true).order('full_name')

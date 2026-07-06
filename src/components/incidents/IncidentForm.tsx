@@ -18,6 +18,7 @@ import { logAuditEvent } from '@/lib/audit'
 import { deadlineFromUrgency } from '@/lib/incident-display'
 import { useIncidentTypes } from '@/lib/useIncidentTypes'
 import { useIncidentTypeLabel } from '@/lib/incident-type-label'
+import { loadMyFactoryId } from '@/lib/useMyFactory'
 
 interface Factory { id: string; name: string; code: string }
 interface Area { id: string; factory_id: string; name: string }
@@ -83,7 +84,17 @@ export default function IncidentForm() {
   useEffect(() => () => { photoPreviews.forEach(u => URL.revokeObjectURL(u)) }, [photoPreviews])
 
   useEffect(() => {
-    supabase.from('factories').select('*').order('name').then(({ data }) => setFactories(data ?? []))
+    // Preselect the reporter's own factory so the report form is one step
+    // shorter for technicians (they can still switch factory manually).
+    Promise.all([
+      supabase.from('factories').select('*').order('name'),
+      loadMyFactoryId(),
+    ]).then(([{ data }, myFactoryId]) => {
+      setFactories(data ?? [])
+      if (myFactoryId && (data ?? []).some(f => f.id === myFactoryId)) {
+        setFactoryId(prev => prev || myFactoryId)
+      }
+    })
     // Active accounts for the reporter picker (still allows manual entry).
     supabase.from('profiles').select('id, full_name').eq('is_active', true).order('full_name')
       .then(({ data }) => setAccounts((data ?? []) as Account[]))

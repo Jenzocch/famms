@@ -17,6 +17,7 @@ import PMScheduleManager from './PMScheduleManager'
 import PMFullCalendar from './PMFullCalendar'
 import PMDueList from './PMDueList'
 import { useI18n } from '@/lib/i18n'
+import { loadMyFactoryId } from '@/lib/useMyFactory'
 
 interface Factory { id: string; name: string }
 interface Area { id: string; factory_id: string; name: string }
@@ -73,7 +74,19 @@ export default function PMPage() {
   const [submitting, setSubmitting] = useState(false)
 
   useEffect(() => {
-    supabase.from('factories').select('*').order('name').then(({ data }) => setFactories(data ?? []))
+    // Load factories, then preselect the signed-in user's own factory (falling
+    // back to the first factory) so technicians land straight on their calendar.
+    async function init() {
+      const [{ data: facs }, myFactoryId] = await Promise.all([
+        supabase.from('factories').select('*').order('name'),
+        loadMyFactoryId(),
+      ])
+      setFactories(facs ?? [])
+      if (!facs || facs.length === 0) return
+      const preferred = myFactoryId && facs.some(f => f.id === myFactoryId) ? myFactoryId : ''
+      setFactoryId(prev => prev || preferred || facs[0].id)
+    }
+    init()
   }, [])
 
   useEffect(() => {
@@ -201,30 +214,15 @@ export default function PMPage() {
         </SelectContent>
       </Select>
 
-      {/* Technician due-list: dates at a glance + search */}
-      {factoryId && <PMDueList factoryId={factoryId} />}
-
-      {/* Factory PM Calendar */}
-      {factoryId && (
-        <div className="space-y-2">
-          <h2 className="font-semibold text-gray-700 text-sm">{t('pm.calendarHeading')}</h2>
-          <PMFullCalendar factoryId={factoryId} />
-        </div>
-      )}
-
-      {/* Overdue Alert */}
-      <div className="border-l-4 border-amber-500 bg-amber-50 rounded-lg p-4">
-        <OverdueMaintenanceAlert />
-      </div>
-
-      {/* PM Schedule Manager */}
+      {/* PM Schedule Manager — rendered up top so the "Rencana" button visibly
+          opens it (it used to render below the calendar, off-screen). */}
       {showSchedules && (
         <div className="bg-green-50 border border-green-200 rounded-xl p-4">
           <PMScheduleManager />
         </div>
       )}
 
-      {/* Add Maintenance Form */}
+      {/* Add Maintenance Form — same reason, open right where the user clicked */}
       {showForm && (
         <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 space-y-4">
           <h3 className="font-semibold text-blue-900">{t('pm.logMaintenance')}</h3>
@@ -288,6 +286,23 @@ export default function PMPage() {
           </div>
         </div>
       )}
+
+      {/* Technician due-list: dates at a glance + search */}
+      {factoryId && <PMDueList factoryId={factoryId} />}
+
+      {/* Factory PM Calendar */}
+      {factoryId && (
+        <div className="space-y-2">
+          <h2 className="font-semibold text-gray-700 text-sm">{t('pm.calendarHeading')}</h2>
+          <PMFullCalendar factoryId={factoryId} />
+        </div>
+      )}
+
+      {/* Overdue Alert */}
+      <div className="border-l-4 border-amber-500 bg-amber-50 rounded-lg p-4">
+        <OverdueMaintenanceAlert />
+      </div>
+
 
       {/* Recent Records — merged ad-hoc logs + scheduled PM completions */}
       <div className="space-y-2">
