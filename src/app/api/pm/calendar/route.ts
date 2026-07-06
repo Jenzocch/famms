@@ -46,15 +46,22 @@ export async function GET(req: Request) {
       return Response.json({ month, events: [], machines: [] })
     }
 
-    // Active schedules for this factory (optionally filtered by machine)
-    let scheduleQuery = supabase
-      .from('pm_schedules')
-      .select('id, machine_id, pm_type, interval_days, description, created_at, assigned_user_ids, assigned_to')
-      .eq('factory_id', factoryId)
-      .eq('is_active', true)
-    if (machineId) scheduleQuery = scheduleQuery.eq('machine_id', machineId)
-    const { data: schedules } = await scheduleQuery
-    const scheduleList = schedules || []
+    // Active schedules for this factory (optionally filtered by machine).
+    // assigned_user_ids / assigned_to only exist once migration_pm_assignee.sql
+    // has run — if it hasn't, select+retry without them so the calendar still
+    // works (assignee display/filter just stays empty until the migration runs).
+    const BASE_COLS = 'id, machine_id, pm_type, interval_days, description, created_at'
+    const scheduleSelect = async (cols: string) => {
+      let q = supabase.from('pm_schedules').select(cols)
+        .eq('factory_id', factoryId).eq('is_active', true)
+      if (machineId) q = q.eq('machine_id', machineId)
+      return q
+    }
+    let scheduleRes = await scheduleSelect(`${BASE_COLS}, assigned_user_ids, assigned_to`)
+    if (scheduleRes.error) {
+      scheduleRes = await scheduleSelect(BASE_COLS)
+    }
+    const scheduleList = (scheduleRes.data as any[]) || []
     const scheduleIds = scheduleList.map(s => s.id)
     const scheduleMap = Object.fromEntries(scheduleList.map(s => [s.id, s]))
 

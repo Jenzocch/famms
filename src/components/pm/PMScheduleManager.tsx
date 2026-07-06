@@ -113,15 +113,30 @@ export default function PMScheduleManager() {
   }, [areaId])
 
   async function loadSchedules() {
-    const { data } = await supabase
-      .from('pm_schedules')
-      .select(`
+    // assigned_user_ids / assigned_to only exist after migration_pm_assignee.sql.
+    // Retry without them if the column is missing, so the list still loads.
+    const withAssignee = `
         id, machine_id, pm_type, interval_days, description, is_active,
         assigned_user_ids, assigned_to,
         machines:machines(machine_name, machine_code)
-      `)
+      `
+    const baseCols = `
+        id, machine_id, pm_type, interval_days, description, is_active,
+        machines:machines(machine_name, machine_code)
+      `
+    let res: any = await supabase
+      .from('pm_schedules')
+      .select(withAssignee)
       .eq('is_active', true)
       .order('created_at', { ascending: false })
+    if (res.error) {
+      res = await supabase
+        .from('pm_schedules')
+        .select(baseCols)
+        .eq('is_active', true)
+        .order('created_at', { ascending: false })
+    }
+    const data = res.data as any[] | null
 
     if (data) {
       const mapped = (data as any[]).map(s => ({
@@ -163,27 +178,35 @@ export default function PMScheduleManager() {
     setSubmitting(true)
     try {
       if (editingId) {
-        const { error } = await supabase
+        // Assignee columns are optional (migration_pm_assignee.sql). Try with
+        // them; if the column is missing, retry without so the edit still saves.
+        const base = { pm_type: pmType, interval_days: intervalValue, description: description || null }
+        let { error } = await supabase
           .from('pm_schedules')
-          .update({
-            pm_type: pmType, interval_days: intervalValue, description: description || null,
-            assigned_user_ids: assignees, assigned_to: assignedTo,
-          })
+          .update({ ...base, assigned_user_ids: assignees, assigned_to: assignedTo })
           .eq('id', editingId)
+        if (error) {
+          ({ error } = await supabase.from('pm_schedules').update(base).eq('id', editingId))
+        }
         if (error) throw error
         toast.success(t('pm.scheduleUpdated'))
       } else {
-        const { error } = await supabase
+        // factory_id is NOT NULL — derive it from the selected factory (the
+        // machine's factory). Without it the insert always failed.
+        const base = {
+          factory_id: factoryId,
+          machine_id: machineId,
+          pm_type: pmType,
+          interval_days: intervalValue,
+          description: description || null,
+          is_active: true,
+        }
+        let { error } = await supabase
           .from('pm_schedules')
-          .insert({
-            machine_id: machineId,
-            pm_type: pmType,
-            interval_days: intervalValue,
-            description: description || null,
-            assigned_user_ids: assignees,
-            assigned_to: assignedTo,
-            is_active: true,
-          })
+          .insert({ ...base, assigned_user_ids: assignees, assigned_to: assignedTo })
+        if (error) {
+          ({ error } = await supabase.from('pm_schedules').insert(base))
+        }
         if (error) throw error
         toast.success(t('pm.scheduleCreated'))
       }
