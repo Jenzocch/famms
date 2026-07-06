@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
-import { notifyFactory } from '@/lib/telegram'
+import { getAuthClaims } from '@/lib/auth'
+import { notifyFactory, esc } from '@/lib/telegram'
 
 const ISSUE_TYPE_LABELS: Record<string, string> = {
   machine: '🔧 機器故障',
@@ -18,6 +19,13 @@ const URGENCY_LABELS: Record<string, string> = {
 
 // POST /api/incidents/notify — send Telegram alert for a new report
 export async function POST(req: Request) {
+  // Login required — without this, anyone on the internet could POST incident
+  // ids and spam every registered Telegram group/user.
+  const claims = await getAuthClaims()
+  if (!claims) {
+    return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+  }
+
   const supabase = await createClient()
   const { incidentId } = await req.json()
   if (!incidentId) {
@@ -53,14 +61,16 @@ export async function POST(req: Request) {
     .maybeSingle()
   if (typeRow) typeLabel = (typeRow as any).label_zh || (typeRow as any).label || typeLabel
 
+  // User-entered fields (title, names) must be escaped — a stray '<' would
+  // otherwise make Telegram reject the whole message as bad HTML.
   const html = [
     `<b>🆕 新報修案件</b>`,
-    `<b>編號:</b> ${incident.incident_no}`,
-    `<b>類型:</b> ${typeLabel}`,
-    `<b>緊急度:</b> ${URGENCY_LABELS[incident.downtime_impact] || incident.downtime_impact}`,
-    incident.title ? `<b>標題:</b> ${incident.title}` : '',
-    `<b>位置:</b> ${factory?.name || '?'}${machine ? ` · ${machine.machine_name}` : ''}`,
-    incident.reporter_name ? `<b>回報人:</b> ${incident.reporter_name}` : '',
+    `<b>編號:</b> ${esc(incident.incident_no)}`,
+    `<b>類型:</b> ${esc(typeLabel)}`,
+    `<b>緊急度:</b> ${URGENCY_LABELS[incident.downtime_impact] || esc(incident.downtime_impact)}`,
+    incident.title ? `<b>標題:</b> ${esc(incident.title)}` : '',
+    `<b>位置:</b> ${esc(factory?.name || '?')}${machine ? ` · ${esc(machine.machine_name)}` : ''}`,
+    incident.reporter_name ? `<b>回報人:</b> ${esc(incident.reporter_name)}` : '',
     `<a href="${appUrl}/incidents/${incident.id}">查看詳情 →</a>`,
   ].filter(Boolean).join('\n')
 

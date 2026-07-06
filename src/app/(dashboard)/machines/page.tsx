@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { getAuthClaims } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import { Plus, Edit2, Trash2, QrCode } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -7,14 +8,14 @@ import StatusBadge from '@/components/shared/StatusBadge'
 export const metadata = { title: 'Mesin | FAMMS' }
 
 export default async function MachinesPage() {
+  const claims = await getAuthClaims()
+  if (!claims?.sub) redirect('/login')
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
 
   const { data: profile } = await supabase
     .from('profiles')
     .select('factory_id')
-    .eq('id', user.id)
+    .eq('id', claims.sub)
     .single()
 
   const { data: machines } = await supabase

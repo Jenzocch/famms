@@ -15,8 +15,10 @@ export function isTelegramConfigured(): boolean {
   return !!TOKEN
 }
 
-// Escape HTML special chars for Telegram HTML parse mode.
-function esc(s: string): string {
+// Escape HTML special chars for Telegram HTML parse mode. Exported so route
+// handlers building their own messages can't forget to sanitize user input
+// (titles, reporter names) — unescaped '<' breaks the whole send.
+export function esc(s: string): string {
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 }
 

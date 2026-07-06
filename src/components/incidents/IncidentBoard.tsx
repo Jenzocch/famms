@@ -104,7 +104,24 @@ export default function IncidentBoard({ rows, userRole = 'technician', initialFi
       {filtered.length === 0 ? (
         <div className="text-center py-16 text-gray-400">
           <AlertCircle className="w-10 h-10 mx-auto mb-2 opacity-30" />
-          <p className="text-sm">{t('board.noIncidents')}</p>
+          {filter !== 'all' ? (
+            // A specific tab is empty — the other tabs may still have cases.
+            <p className="text-sm">{t('board.noInFilter', '此分類目前沒有案件')}</p>
+          ) : (
+            <>
+              <p className="text-sm">
+                {PERMISSIONS.boardFull(userRole)
+                  ? t('board.noIncidents')
+                  : t('board.emptyMine', '目前沒有指派給你或你回報的案件')}
+              </p>
+              <Link
+                href="/incidents/new"
+                className="inline-flex items-center gap-1.5 mt-4 px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium active:bg-blue-700"
+              >
+                {t('board.reportCta', '回報問題')}
+              </Link>
+            </>
+          )}
         </div>
       ) : (
         <div className="space-y-3">

@@ -129,9 +129,9 @@ export default function PMFullCalendar({ factoryId }: PMFullCalendarProps) {
   const [onlyMine, setOnlyMine] = useState(false)
 
   // Current user id, so "only my maintenance" can filter to schedules this
-  // person is assigned to.
+  // person is assigned to. (getSession = local read, no network call.)
   useEffect(() => {
-    createClient().auth.getUser().then(({ data }) => setMyId(data.user?.id ?? null))
+    createClient().auth.getSession().then(({ data }) => setMyId(data.session?.user.id ?? null))
   }, [])
 
   // Inline action state for completing/skipping a real task from the detail panel

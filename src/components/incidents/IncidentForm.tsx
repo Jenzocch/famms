@@ -94,9 +94,11 @@ export default function IncidentForm() {
     // Default the reporter to the logged-in account — most reports are
     // self-reports. Picking someone else / typing a name stays possible for
     // on-behalf reporting, and anything the user already entered is kept.
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (!user) return
-      supabase.from('profiles').select('id, full_name').eq('id', user.id).single()
+    // (getSession = local read, keeps the form opening instantly.)
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      const uid = session?.user.id
+      if (!uid) return
+      supabase.from('profiles').select('id, full_name').eq('id', uid).single()
         .then(({ data }) => {
           if (!data) return
           setReporterAccountId(prev => prev || data.id)
