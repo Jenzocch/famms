@@ -18,6 +18,8 @@ import PMFullCalendar from './PMFullCalendar'
 import PMDueList from './PMDueList'
 import { useI18n } from '@/lib/i18n'
 import { loadMyFactoryId } from '@/lib/useMyFactory'
+import { PERMISSIONS } from '@/lib/permissions'
+import type { UserRole } from '@/types'
 
 interface Factory { id: string; name: string }
 interface Area { id: string; factory_id: string; name: string }
@@ -54,10 +56,11 @@ const PM_TYPE_KEYS: Record<string, string> = {
   yearly: 'pm.cadYearly', custom: 'pm.cadCustom',
 }
 
-export default function PMPage() {
+export default function PMPage({ role = 'technician' }: { role?: UserRole }) {
   const supabase = createClient()
   const { t } = useI18n()
   const dateLocale = useDateLocale()
+  const canManageSchedules = PERMISSIONS.managePMSchedules(role)
 
   const [factories, setFactories] = useState<Factory[]>([])
   const [areas, setAreas] = useState<Area[]>([])
@@ -195,9 +198,11 @@ export default function PMPage() {
           <p className="text-sm text-gray-500 mt-1">{t('pm.manageSubtitle')}</p>
         </div>
         <div className="flex gap-2">
-          <Button onClick={() => setShowSchedules(!showSchedules)} variant="outline" className="gap-2">
-            <Settings className="w-4 h-4" /> {t('pm.plansBtn')}
-          </Button>
+          {canManageSchedules && (
+            <Button onClick={() => setShowSchedules(!showSchedules)} variant="outline" className="gap-2">
+              <Settings className="w-4 h-4" /> {t('pm.plansBtn')}
+            </Button>
+          )}
           <Button onClick={() => setShowForm(!showForm)} className="gap-2">
             <Plus className="w-4 h-4" /> {t('pm.addMaintenance')}
           </Button>
@@ -216,7 +221,7 @@ export default function PMPage() {
 
       {/* PM Schedule Manager — rendered up top so the "Rencana" button visibly
           opens it (it used to render below the calendar, off-screen). */}
-      {showSchedules && (
+      {canManageSchedules && showSchedules && (
         <div className="bg-green-50 border border-green-200 rounded-xl p-4">
           <PMScheduleManager />
         </div>
