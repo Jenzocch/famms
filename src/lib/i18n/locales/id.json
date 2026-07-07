@@ -239,7 +239,7 @@
   "pm": {
     "manageTitle": "Manajemen PM",
     "manageSubtitle": "Lacak frekuensi & rencana perawatan mesin",
-    "plansBtn": "Rencana PM",
+    "plansBtn": "Jadwal Rutin",
     "plansHint": "Atur siklus PM rutin mesin (harian/mingguan/bulanan); kalender otomatis mengingatkan saat jatuh tempo",
     "logHint": "Catat perawatan sekali yang baru selesai (tidak terjadwal)",
     "selectFactoryErr": "Pilih pabrik dulu",
@@ -302,7 +302,7 @@
     "confirmSkip": "⏭️ Konfirmasi Lewati",
     "showingTasks": "Hari ini + 7 hari ke depan · {count} total",
     "trackFrequency": "Pantau frekuensi perawatan mesin",
-    "addMaintenance": "Tambah Perawatan",
+    "addMaintenance": "Catat Selesai",
     "logMaintenance": "Catat Perawatan",
     "machineStatus": "Status Perawatan Mesin Area",
     "recentRecords": "Catatan Perawatan Terbaru",

@@ -239,7 +239,7 @@
   "pm": {
     "manageTitle": "保養管理",
     "manageSubtitle": "追蹤機器保養頻率與計畫",
-    "plansBtn": "PM 計畫",
+    "plansBtn": "定期排程",
     "plansHint": "設定機器的定期保養週期(每日/每週/每月),系統會自動在日曆上提醒到期",
     "logHint": "登記剛完成的一次性保養(臨時、不在排程內)",
     "selectFactoryErr": "請先選擇工廠",
@@ -302,7 +302,7 @@
     "confirmSkip": "⏭️ 確認跳過",
     "showingTasks": "顯示今日及未來7天 · 共{count}項",
     "trackFrequency": "追蹤機器保養頻率",
-    "addMaintenance": "新增保養",
+    "addMaintenance": "登記保養",
     "logMaintenance": "記錄保養",
     "machineStatus": "區域機器保養狀態",
     "recentRecords": "最近保養紀錄",

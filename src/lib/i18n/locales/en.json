@@ -239,7 +239,7 @@
   "pm": {
     "manageTitle": "PM Management",
     "manageSubtitle": "Track machine maintenance frequency & plans",
-    "plansBtn": "PM Plans",
+    "plansBtn": "Recurring Schedule",
     "plansHint": "Set a machine's recurring PM cycle (daily/weekly/monthly); the calendar reminds you when it's due",
     "logHint": "Record a one-off maintenance you just finished (unplanned, not on a schedule)",
     "selectFactoryErr": "Please select a factory first",
@@ -302,7 +302,7 @@
     "confirmSkip": "⏭️ Confirm Skip",
     "showingTasks": "Showing today + next 7 days · {count} total",
     "trackFrequency": "Track machine maintenance frequency",
-    "addMaintenance": "Add Maintenance",
+    "addMaintenance": "Log Completed",
     "logMaintenance": "Log Maintenance",
     "machineStatus": "Area Machine Maintenance Status",
     "recentRecords": "Recent Maintenance Records",
