@@ -176,6 +176,16 @@ ALTER TABLE vendors DISABLE ROW LEVEL SECURITY;
 CREATE INDEX IF NOT EXISTS idx_vendors_factory ON vendors(factory_id);
 
 -- ---------------------------------------------------------------------------
+-- MAINTENANCE COSTS — close-time cost capture (labor / parts per incident)
+-- ---------------------------------------------------------------------------
+-- Incidents may have no machine (facility issues), so machine_id can't stay
+-- NOT NULL; costs link back to their incident for the monthly report.
+ALTER TABLE maintenance_costs ALTER COLUMN machine_id DROP NOT NULL;
+ALTER TABLE maintenance_costs ADD COLUMN IF NOT EXISTS incident_id UUID REFERENCES incidents(id) ON DELETE SET NULL;
+CREATE INDEX IF NOT EXISTS idx_maintenance_costs_incident ON maintenance_costs(incident_id);
+CREATE INDEX IF NOT EXISTS idx_maintenance_costs_date ON maintenance_costs(cost_date DESC);
+
+-- ---------------------------------------------------------------------------
 -- Make PostgREST (the Supabase API) pick up all of the above immediately.
 -- ---------------------------------------------------------------------------
 GRANT ALL ON ALL TABLES    IN SCHEMA public TO anon, authenticated, service_role;

@@ -79,6 +79,10 @@ export default function ProgressUpdate({
   const [photos, setPhotos] = useState<File[]>([])
   const [allowRollback, setAllowRollback] = useState(false)
   const [completionType, setCompletionType] = useState<'temporary_fix' | 'permanent_fix' | ''>('')
+  // Optional close-time costs — the cheapest possible cost tracking: two
+  // numbers at the moment the work is freshest in memory.
+  const [laborCost, setLaborCost] = useState('')
+  const [partsCost, setPartsCost] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [compressing, setCompressing] = useState(false)
 
@@ -165,7 +169,12 @@ export default function ProgressUpdate({
         const res = await fetch(`/api/incidents/${incidentId}/close`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ root_cause: note || undefined, completion_type: completionType || undefined }),
+          body: JSON.stringify({
+            root_cause: note || undefined,
+            completion_type: completionType || undefined,
+            labor_cost: laborCost ? parseFloat(laborCost) : undefined,
+            parts_cost: partsCost ? parseFloat(partsCost) : undefined,
+          }),
         })
         const json = await res.json().catch(() => ({}))
         if (!res.ok) {
@@ -301,6 +310,35 @@ export default function ProgressUpdate({
               <span className="text-sm font-semibold block">⚠️ {t('progressUpdate.temporaryFix', '臨時修復')}</span>
               <span className="text-xs text-gray-500 block mt-0.5">{t('progressUpdate.temporaryFixDesc', '需觀察 30 天，根本原因未解決')}</span>
             </button>
+          </div>
+
+          {/* Optional costs — feed the monthly report; skippable so closing
+              never gets blocked on missing numbers. */}
+          <div className="grid grid-cols-2 gap-2 mt-3">
+            <div>
+              <Label className="text-xs">{t('progressUpdate.laborCost', '工時費用（選填）')}</Label>
+              <input
+                type="number"
+                inputMode="decimal"
+                min={0}
+                value={laborCost}
+                onChange={e => setLaborCost(e.target.value)}
+                placeholder="0"
+                className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+              />
+            </div>
+            <div>
+              <Label className="text-xs">{t('progressUpdate.partsCost', '零件/材料費用（選填）')}</Label>
+              <input
+                type="number"
+                inputMode="decimal"
+                min={0}
+                value={partsCost}
+                onChange={e => setPartsCost(e.target.value)}
+                placeholder="0"
+                className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+              />
+            </div>
           </div>
         </div>
       )}

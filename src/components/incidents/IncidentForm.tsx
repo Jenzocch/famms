@@ -51,7 +51,7 @@ const URGENCY = [
   { value: 'low', labelKey: 'report.urgencyLow', descKey: 'report.urgencyLowDesc' },
 ]
 
-export default function IncidentForm() {
+export default function IncidentForm({ presetMachineId }: { presetMachineId?: string } = {}) {
   const router = useRouter()
   const supabase = createClient()
   const { t } = useI18n()
@@ -85,6 +85,9 @@ export default function IncidentForm() {
   const [compressing, setCompressing] = useState(false)
   // Area waiting to be re-applied once its factory's areas finish loading.
   const restoredAreaRef = useRef<string | null>(null)
+  // Machine waiting to be applied once its area's machines finish loading
+  // (set by the QR scan-to-report flow).
+  const restoredAssetRef = useRef<string | null>(null)
 
   // Stable preview URLs — created once per photo list and revoked when the
   // list changes/unmounts, instead of leaking a new blob URL every render.
@@ -94,12 +97,14 @@ export default function IncidentForm() {
   useEffect(() => {
     // Preselect the reporter's own factory so the report form is one step
     // shorter for technicians (they can still switch factory manually).
+    // Skipped when a QR preset is present — otherwise the two async setters
+    // can race and swallow the preset's area/machine restore.
     Promise.all([
       loadFactories(),
       loadMyFactoryId(),
     ]).then(([data, myFactoryId]) => {
       setFactories((data ?? []) as Factory[])
-      if (myFactoryId && (data ?? []).some(f => f.id === myFactoryId)) {
+      if (!presetMachineId && myFactoryId && (data ?? []).some(f => f.id === myFactoryId)) {
         setFactoryId(prev => prev || myFactoryId)
       }
     })
@@ -122,6 +127,24 @@ export default function IncidentForm() {
           setReporterName(prev => prev || data.full_name || '')
         })
     })
+
+    // QR scan-to-report: ?machine=<id> preselects the whole location cascade
+    // (factory → area → machine), overriding the last-used restore below.
+    if (presetMachineId) {
+      supabase
+        .from('machines')
+        .select('id, area_id, area:areas(factory_id)')
+        .eq('id', presetMachineId)
+        .single()
+        .then(({ data }) => {
+          const factoryId = (data?.area as { factory_id?: string } | null)?.factory_id
+          if (!data || !factoryId) return
+          restoredAreaRef.current = data.area_id
+          restoredAssetRef.current = data.id
+          setFactoryId(factoryId)
+        })
+      return
+    }
 
     // Restore the last-used factory/area for repeat reports.
     try {
@@ -151,7 +174,13 @@ export default function IncidentForm() {
     if (!areaId) { setAssets([]); setAssetId(''); return }
     supabase.from('machines').select('id, area_id, machine_name, machine_code')
       .eq('area_id', areaId).neq('status', 'scrapped').order('machine_name')
-      .then(({ data }) => setAssets(data ?? []))
+      .then(({ data }) => {
+        setAssets(data ?? [])
+        // Apply the QR-preset machine once, only while it actually exists here.
+        const pending = restoredAssetRef.current
+        restoredAssetRef.current = null
+        if (pending && (data ?? []).some(m => m.id === pending)) setAssetId(pending)
+      })
     setAssetId('')
   }, [areaId])
 

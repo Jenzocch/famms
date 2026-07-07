@@ -16,7 +16,8 @@
     "inbox": "Perlu tindakan Anda",
     "inboxAccept": "Belum diterima",
     "inboxWaiting": "Menunggu",
-    "inboxConfirm": "Konfirmasi & tutup"
+    "inboxConfirm": "Konfirmasi & tutup",
+    "monthlyReport": "Laporan"
   },
   "assign": {
     "title": "Penugasan",
@@ -228,7 +229,9 @@
     "permanentFix": "Perbaikan Permanen",
     "permanentFixDesc": "Akar masalah terselesaikan",
     "temporaryFix": "Perbaikan Sementara",
-    "temporaryFixDesc": "Pantau 30 hari, akar masalah belum selesai"
+    "temporaryFixDesc": "Pantau 30 hari, akar masalah belum selesai",
+    "laborCost": "Biaya tenaga kerja (opsional)",
+    "partsCost": "Biaya suku cadang (opsional)"
   },
   "pm": {
     "manageTitle": "Manajemen PM",
@@ -961,5 +964,44 @@
     "title": "Akun dinonaktifkan",
     "desc": "Akun ini tidak dapat digunakan saat ini. Hubungi admin sistem.",
     "logout": "Keluar"
+  },
+  "reports": {
+    "title": "Laporan Bulanan",
+    "allFactories": "Semua pabrik",
+    "print": "Cetak",
+    "incidentsSummary": "Ringkasan laporan",
+    "total": "Total",
+    "closed": "Selesai",
+    "stillOpen": "Masih terbuka",
+    "urgent": "Mendesak",
+    "avgResponse": "Rata-rata respons",
+    "avgResolution": "Rata-rata penyelesaian",
+    "avgResponseMin": "Rata-rata respons (menit)",
+    "avgResolutionHr": "Rata-rata penyelesaian (jam)",
+    "minutes": "mnt",
+    "hours": "jam",
+    "pmSection": "Pelaksanaan PM",
+    "pmScheduled": "Terjadwal",
+    "pmCompleted": "Selesai",
+    "pmSkipped": "Dilewati",
+    "pmCompliance": "Kepatuhan PM",
+    "adhoc": "Perawatan tambahan",
+    "costs": "Biaya perawatan",
+    "costLabor": "Tenaga kerja",
+    "costParts": "Suku cadang",
+    "costVendor": "Vendor",
+    "costTotal": "Total",
+    "noCosts": "Belum ada catatan biaya bulan ini (biaya bisa diisi saat menutup kasus)",
+    "byType": "Distribusi jenis masalah",
+    "topMachines": "Mesin paling sering rusak",
+    "noData": "Tidak ada data bulan ini",
+    "colTitle": "Judul",
+    "colType": "Jenis",
+    "colStatus": "Status",
+    "colUrgency": "Urgensi",
+    "colMachine": "Mesin",
+    "colFactory": "Pabrik",
+    "colReported": "Dilaporkan",
+    "colClosed": "Ditutup"
   }
 }

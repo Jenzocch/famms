@@ -16,7 +16,8 @@
     "inbox": "Needs your action",
     "inboxAccept": "To accept",
     "inboxWaiting": "Waiting",
-    "inboxConfirm": "To confirm & close"
+    "inboxConfirm": "To confirm & close",
+    "monthlyReport": "Report"
   },
   "assign": {
     "title": "Assignment",
@@ -228,7 +229,9 @@
     "permanentFix": "Permanent Fix",
     "permanentFixDesc": "Root cause resolved",
     "temporaryFix": "Temporary Fix",
-    "temporaryFixDesc": "Observe 30 days, root cause unresolved"
+    "temporaryFixDesc": "Observe 30 days, root cause unresolved",
+    "laborCost": "Labor cost (optional)",
+    "partsCost": "Parts cost (optional)"
   },
   "pm": {
     "manageTitle": "PM Management",
@@ -961,5 +964,44 @@
     "title": "Account disabled",
     "desc": "This account is currently unavailable. Please contact the system administrator.",
     "logout": "Sign out"
+  },
+  "reports": {
+    "title": "Monthly Report",
+    "allFactories": "All factories",
+    "print": "Print",
+    "incidentsSummary": "Incident summary",
+    "total": "Total",
+    "closed": "Closed",
+    "stillOpen": "Still open",
+    "urgent": "Urgent",
+    "avgResponse": "Avg response",
+    "avgResolution": "Avg resolution",
+    "avgResponseMin": "Avg response (min)",
+    "avgResolutionHr": "Avg resolution (h)",
+    "minutes": "min",
+    "hours": "h",
+    "pmSection": "PM execution",
+    "pmScheduled": "Scheduled",
+    "pmCompleted": "Completed",
+    "pmSkipped": "Skipped",
+    "pmCompliance": "PM compliance",
+    "adhoc": "Ad-hoc jobs",
+    "costs": "Maintenance costs",
+    "costLabor": "Labor",
+    "costParts": "Parts",
+    "costVendor": "Vendor",
+    "costTotal": "Total",
+    "noCosts": "No cost records this month (labor/parts can be entered when closing a case)",
+    "byType": "By issue type",
+    "topMachines": "Top failing machines",
+    "noData": "No data this month",
+    "colTitle": "Title",
+    "colType": "Type",
+    "colStatus": "Status",
+    "colUrgency": "Urgency",
+    "colMachine": "Machine",
+    "colFactory": "Factory",
+    "colReported": "Reported",
+    "colClosed": "Closed"
   }
 }

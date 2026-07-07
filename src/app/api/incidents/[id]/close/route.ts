@@ -25,14 +25,16 @@ export async function POST(
 
   const { id } = await params
   const body = await req.json().catch(() => ({}))
-  const { root_cause, completion_type } = body as {
+  const { root_cause, completion_type, labor_cost, parts_cost } = body as {
     root_cause?: string
     completion_type?: string
+    labor_cost?: number
+    parts_cost?: number
   }
 
   const { data: incident, error: loadErr } = await supabase
     .from('incidents')
-    .select('id, factory_id, failure_code_id, status, accepted_at')
+    .select('id, factory_id, machine_id, failure_code_id, status, accepted_at')
     .eq('id', id)
     .single()
   if (loadErr || !incident) {
@@ -86,5 +88,26 @@ export async function POST(
     return NextResponse.json({ error: updateErr.message }, { status: 500 })
   }
 
-  return NextResponse.json({ incident: updated })
+  // Optional close-time costs (labor / parts). Non-fatal: a cost-insert
+  // failure (e.g. migration not run yet) must never block the close itself.
+  const costRows = [
+    { type: 'labor', amount: labor_cost },
+    { type: 'parts', amount: parts_cost },
+  ].filter(c => typeof c.amount === 'number' && c.amount! > 0)
+  let costsSaved = 0
+  if (costRows.length > 0) {
+    const { error: costErr } = await supabase.from('maintenance_costs').insert(
+      costRows.map(c => ({
+        factory_id: incident.factory_id,
+        machine_id: incident.machine_id ?? null,
+        incident_id: incident.id,
+        cost_type: c.type,
+        amount: c.amount,
+        cost_date: now.slice(0, 10),
+      }))
+    )
+    if (!costErr) costsSaved = costRows.length
+  }
+
+  return NextResponse.json({ incident: updated, costs_saved: costsSaved })
 }

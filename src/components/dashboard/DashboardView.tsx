@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { AlertTriangle, Clock, Factory, ChevronRight, CheckCircle2, Wrench, Inbox } from 'lucide-react'
+import { AlertTriangle, Clock, Factory, ChevronRight, CheckCircle2, Wrench, Inbox, BarChart3 } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import { zhTW, enUS, id as idLocale } from 'date-fns/locale'
 import { IncidentStatus, UserRole } from '@/types'
@@ -58,9 +58,17 @@ export default function DashboardView({
 
   return (
     <div className="space-y-5">
-      <div>
-        <h1 className="text-xl font-bold text-gray-900">{t('dash.title')}</h1>
-        <p className="text-sm text-gray-500 mt-1">{t('dash.overview')}</p>
+      <div className="flex items-start justify-between gap-2">
+        <div>
+          <h1 className="text-xl font-bold text-gray-900">{t('dash.title')}</h1>
+          <p className="text-sm text-gray-500 mt-1">{t('dash.overview')}</p>
+        </div>
+        <Link
+          href="/reports"
+          className="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:border-blue-400 active:bg-gray-50 shrink-0"
+        >
+          <BarChart3 className="w-4 h-4" /> {t('dash.monthlyReport', '月報 Report')}
+        </Link>
       </div>
 
       {/* Action inbox — the three queues to drain daily; each deep-links to the

@@ -16,7 +16,8 @@
     "inbox": "需要你處理",
     "inboxAccept": "未接單",
     "inboxWaiting": "等待中",
-    "inboxConfirm": "待確認結案"
+    "inboxConfirm": "待確認結案",
+    "monthlyReport": "月報 Report"
   },
   "assign": {
     "title": "派工指派",
@@ -228,7 +229,9 @@
     "permanentFix": "永久修復",
     "permanentFixDesc": "已解決根本原因",
     "temporaryFix": "臨時修復",
-    "temporaryFixDesc": "需觀察 30 天，根本原因未解決"
+    "temporaryFixDesc": "需觀察 30 天，根本原因未解決",
+    "laborCost": "工時費用（選填）",
+    "partsCost": "零件/材料費用（選填）"
   },
   "pm": {
     "manageTitle": "保養管理",
@@ -961,5 +964,44 @@
     "title": "帳號已停用",
     "desc": "此帳號目前無法使用，請聯絡系統管理員。",
     "logout": "登出"
+  },
+  "reports": {
+    "title": "月報",
+    "allFactories": "全部工廠",
+    "print": "列印",
+    "incidentsSummary": "報修統計",
+    "total": "總件數",
+    "closed": "已結案",
+    "stillOpen": "未結案",
+    "urgent": "緊急件",
+    "avgResponse": "平均回應",
+    "avgResolution": "平均結案",
+    "avgResponseMin": "平均回應（分鐘）",
+    "avgResolutionHr": "平均結案（小時）",
+    "minutes": "分",
+    "hours": "小時",
+    "pmSection": "保養執行",
+    "pmScheduled": "排定",
+    "pmCompleted": "完成",
+    "pmSkipped": "跳過",
+    "pmCompliance": "PM 完成率",
+    "adhoc": "臨時維修",
+    "costs": "維修費用",
+    "costLabor": "工時費",
+    "costParts": "零件費",
+    "costVendor": "外包費",
+    "costTotal": "合計",
+    "noCosts": "本月尚無費用記錄（結案時可填工時/零件費）",
+    "byType": "問題類型分布",
+    "topMachines": "故障最多設備",
+    "noData": "本月無資料",
+    "colTitle": "標題",
+    "colType": "類型",
+    "colStatus": "狀態",
+    "colUrgency": "緊急度",
+    "colMachine": "設備",
+    "colFactory": "工廠",
+    "colReported": "回報時間",
+    "colClosed": "結案時間"
   }
 }
