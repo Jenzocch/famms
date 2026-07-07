@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { ClipboardList, Plus, LayoutDashboard, Settings, Wrench, LogOut, User } from 'lucide-react'
+import { ClipboardList, Plus, LayoutDashboard, Settings, Wrench, LogOut, User, BookOpen } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { Profile, UserRole } from '@/types'
 import { PERMISSIONS } from '@/lib/permissions'
@@ -23,6 +23,7 @@ const NAV: NavItem[] = [
   { href: '/incidents', labelKey: 'navigation.incidents', icon: ClipboardList },
   { href: '/incidents/new', labelKey: 'navigation.newIncident', icon: Plus },
   { href: '/pm', labelKey: 'navigation.pm', icon: Wrench },
+  { href: '/knowledge-base', labelKey: 'navigation.knowledgeBase', icon: BookOpen },
   { href: '/settings', labelKey: 'navigation.settings', icon: Settings, requiredRole: (r) => PERMISSIONS.viewSettings(r) },
 ]
 

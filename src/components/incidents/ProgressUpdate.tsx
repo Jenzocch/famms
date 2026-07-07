@@ -83,6 +83,9 @@ export default function ProgressUpdate({
   // numbers at the moment the work is freshest in memory.
   const [laborCost, setLaborCost] = useState('')
   const [partsCost, setPartsCost] = useState('')
+  // Save the fix into the knowledge base so the next technician can find it.
+  const [saveToKb, setSaveToKb] = useState(true)
+  const [repairMethod, setRepairMethod] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [compressing, setCompressing] = useState(false)
 
@@ -174,6 +177,8 @@ export default function ProgressUpdate({
             completion_type: completionType || undefined,
             labor_cost: laborCost ? parseFloat(laborCost) : undefined,
             parts_cost: partsCost ? parseFloat(partsCost) : undefined,
+            save_to_kb: saveToKb,
+            repair_method: repairMethod || undefined,
           }),
         })
         const json = await res.json().catch(() => ({}))
@@ -340,6 +345,31 @@ export default function ProgressUpdate({
               />
             </div>
           </div>
+
+          {/* Knowledge base capture */}
+          <label className="mt-3 flex items-start gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={saveToKb}
+              onChange={e => setSaveToKb(e.target.checked)}
+              className="mt-0.5 w-4 h-4 accent-blue-600 shrink-0"
+            />
+            <span className="text-sm text-gray-700">
+              {t('progressUpdate.saveToKb', '存入知識庫（下次同樣問題可查到怎麼修）')}
+            </span>
+          </label>
+          {saveToKb && (
+            <div className="mt-2">
+              <Label className="text-xs">{t('progressUpdate.repairMethod', '修理方法（選填，未填則使用下方備註）')}</Label>
+              <Textarea
+                value={repairMethod}
+                onChange={e => setRepairMethod(e.target.value)}
+                placeholder={t('progressUpdate.repairMethodPh', '例如：更換 bearing 6205、重新校正 sensor 位置…')}
+                rows={2}
+                className="mt-1"
+              />
+            </div>
+          )}
         </div>
       )}
 

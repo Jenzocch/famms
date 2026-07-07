@@ -25,16 +25,18 @@ export async function POST(
 
   const { id } = await params
   const body = await req.json().catch(() => ({}))
-  const { root_cause, completion_type, labor_cost, parts_cost } = body as {
+  const { root_cause, completion_type, labor_cost, parts_cost, save_to_kb, repair_method } = body as {
     root_cause?: string
     completion_type?: string
     labor_cost?: number
     parts_cost?: number
+    save_to_kb?: boolean
+    repair_method?: string
   }
 
   const { data: incident, error: loadErr } = await supabase
     .from('incidents')
-    .select('id, factory_id, machine_id, failure_code_id, status, accepted_at')
+    .select('id, factory_id, machine_id, failure_code_id, status, accepted_at, title, description, incident_type, machine:machines(machine_name, machine_code)')
     .eq('id', id)
     .single()
   if (loadErr || !incident) {
@@ -109,5 +111,25 @@ export async function POST(
     if (!costErr) costsSaved = costRows.length
   }
 
-  return NextResponse.json({ incident: updated, costs_saved: costsSaved })
+  // Optional knowledge-base capture — turns the close note into searchable
+  // experience for the next technician. Non-fatal like the cost insert.
+  let kbSaved = false
+  if (save_to_kb && (root_cause || repair_method)) {
+    const machine = incident.machine as unknown as { machine_name?: string; machine_code?: string | null } | null
+    const problem = [incident.title, incident.description].filter(Boolean).join(' — ')
+      || incident.incident_type
+    const keywords = [machine?.machine_code, machine?.machine_name, incident.incident_type]
+      .filter(Boolean).join(' ')
+    const { error: kbErr } = await supabase.from('knowledge_base').insert({
+      incident_id: incident.id,
+      problem,
+      root_cause: root_cause || repair_method || '-',
+      repair_method: repair_method || root_cause || '-',
+      keywords,
+      created_by_id: user.id,
+    })
+    kbSaved = !kbErr
+  }
+
+  return NextResponse.json({ incident: updated, costs_saved: costsSaved, kb_saved: kbSaved })
 }

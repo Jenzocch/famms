@@ -231,7 +231,10 @@
     "temporaryFix": "Temporary Fix",
     "temporaryFixDesc": "Observe 30 days, root cause unresolved",
     "laborCost": "Labor cost (optional)",
-    "partsCost": "Parts cost (optional)"
+    "partsCost": "Parts cost (optional)",
+    "saveToKb": "Save to knowledge base (searchable next time)",
+    "repairMethod": "Repair method (optional; falls back to the note below)",
+    "repairMethodPh": "e.g. replaced bearing 6205, recalibrated sensor position…"
   },
   "pm": {
     "manageTitle": "PM Management",
