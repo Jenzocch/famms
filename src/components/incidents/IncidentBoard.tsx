@@ -81,7 +81,7 @@ export default function IncidentBoard({ rows, userRole = 'technician', initialFi
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 md:space-y-5">
       <h1 className="text-xl font-bold text-gray-900">{t('board.heading')}</h1>
 
       {/* Filter tabs */}
@@ -131,8 +131,9 @@ export default function IncidentBoard({ rows, userRole = 'technician', initialFi
       ) : (
         // One column on phones (thumb-scroll), but fan out into 2–3 columns on
         // wider screens so the desktop's horizontal space is used instead of
-        // one long vertical scroll.
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 items-start">
+        // one long vertical scroll. Gaps widen with the viewport — cramped
+        // columns read worse than fewer columns.
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 md:gap-5 items-start">
           {sorted.map(inc => {
             const urgency = URGENCY_FROM_IMPACT[inc.downtime_impact]
             const overdue = isOverdue(inc)
@@ -146,7 +147,7 @@ export default function IncidentBoard({ rows, userRole = 'technician', initialFi
               >
               <Link
                 href={`/incidents/${inc.id}`}
-                className="block p-4 rounded-2xl active:bg-gray-50"
+                className="block p-4 md:p-5 rounded-2xl active:bg-gray-50"
               >
                 {/* Top row — the two things a technician triages on: how urgent,
                     and what state it's in. Everything else (case no., reporter)
