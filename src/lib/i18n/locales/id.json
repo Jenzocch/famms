@@ -987,7 +987,8 @@
       "ordered": "Dipesan",
       "received": "Diterima",
       "rejected": "Dibatalkan"
-    }
+    },
+    "openApp": "Buka Gudang App"
   },
   "printReport": {
     "openBtn": "Cetak Laporan",

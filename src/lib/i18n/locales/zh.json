@@ -987,7 +987,8 @@
       "ordered": "已下單",
       "received": "已到貨",
       "rejected": "已取消"
-    }
+    },
+    "openApp": "開啟 Gudang App"
   },
   "printReport": {
     "openBtn": "列印報告",

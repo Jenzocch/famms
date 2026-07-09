@@ -987,7 +987,8 @@
       "ordered": "Ordered",
       "received": "Received",
       "rejected": "Cancelled"
-    }
+    },
+    "openApp": "Open Gudang App"
   },
   "printReport": {
     "openBtn": "Print Report",
