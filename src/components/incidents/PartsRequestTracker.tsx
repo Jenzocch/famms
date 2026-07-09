@@ -1,8 +1,10 @@
 'use client'
 
-import { Package } from 'lucide-react'
+import { ExternalLink, Package, Warehouse } from 'lucide-react'
 import { format } from 'date-fns'
 import { useI18n } from '@/lib/i18n'
+
+const GUDANG_APP_URL = process.env.NEXT_PUBLIC_GUDANG_APP_URL
 
 interface TrackedRequest {
   id: string
@@ -29,9 +31,23 @@ export default function PartsRequestTracker({ requests }: { requests: TrackedReq
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-4 space-y-2">
-      <div className="flex items-center gap-2 font-semibold text-gray-900 text-sm">
-        <Package className="w-4 h-4 text-emerald-600" />
-        {t('gudang.trackingHeading', '叫料狀態')}
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2 font-semibold text-gray-900 text-sm">
+          <Package className="w-4 h-4 text-emerald-600" />
+          {t('gudang.trackingHeading', '叫料狀態')}
+        </div>
+        {GUDANG_APP_URL && (
+          <a
+            href={GUDANG_APP_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 text-xs font-medium text-emerald-700 hover:text-emerald-800 shrink-0"
+          >
+            <Warehouse className="w-3.5 h-3.5" />
+            {t('gudang.openApp', '開啟 Gudang App')}
+            <ExternalLink className="w-3 h-3" />
+          </a>
+        )}
       </div>
       {requests.map(r => (
         <div key={r.id} className="border rounded-lg p-2.5 flex items-start justify-between gap-2">

@@ -38,7 +38,8 @@
     "noMatch": "找不到符合的帳號",
     "showAllAccounts": "顯示其他工廠人員（{count}）",
     "showFactoryOnly": "只顯示本廠人員",
-    "vendors": "常用廠商"
+    "vendors": "常用廠商",
+    "dueDateSupervisorOnly": "完成日由主管設定"
   },
   "report": {
     "title": "回報問題",
@@ -584,7 +585,10 @@
     "vendorNameRequired": "請輸入廠商名稱",
     "vendorAdded": "廠商已新增",
     "vendorConfirmDelete": "確定要移除這個廠商嗎？",
-    "vendorEmpty": "尚無廠商，點擊上方新增"
+    "vendorEmpty": "尚無廠商，點擊上方新增",
+    "telegramChatId": "Telegram Chat ID（選填）",
+    "telegramChatIdHint": "員工在 Telegram 私訊 bot 傳送 /start 取得。留空則不設定。",
+    "telegramChatIdNeedsFactory": "跨廠帳號無法在此設定，請至設定頁的 Telegram 個人通知新增"
   },
   "telegram": {
     "configured": "Telegram Bot 已設定（TELEGRAM_BOT_TOKEN 已啟用）。",
@@ -983,7 +987,8 @@
       "ordered": "已下單",
       "received": "已到貨",
       "rejected": "已取消"
-    }
+    },
+    "openApp": "開啟 Gudang App"
   },
   "printReport": {
     "openBtn": "列印報告",

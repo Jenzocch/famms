@@ -38,7 +38,8 @@
     "noMatch": "Tidak ada akun yang cocok",
     "showAllAccounts": "Tampilkan akun pabrik lain ({count})",
     "showFactoryOnly": "Hanya pabrik ini",
-    "vendors": "Vendor"
+    "vendors": "Vendor",
+    "dueDateSupervisorOnly": "Tanggal target ditetapkan oleh supervisor"
   },
   "report": {
     "title": "Lapor Masalah",
@@ -584,7 +585,10 @@
     "vendorNameRequired": "Silakan masukkan nama vendor",
     "vendorAdded": "Vendor ditambahkan",
     "vendorConfirmDelete": "Hapus vendor ini?",
-    "vendorEmpty": "Belum ada vendor — tambahkan di atas"
+    "vendorEmpty": "Belum ada vendor — tambahkan di atas",
+    "telegramChatId": "Telegram Chat ID (opsional)",
+    "telegramChatIdHint": "Karyawan dapatkan ini dengan chat /start ke bot Telegram. Kosongkan jika tidak perlu.",
+    "telegramChatIdNeedsFactory": "Tidak bisa diatur di sini untuk akun lintas pabrik — tambahkan lewat Pengaturan → Notifikasi personal Telegram"
   },
   "telegram": {
     "configured": "Bot Telegram terkonfigurasi (TELEGRAM_BOT_TOKEN aktif).",
@@ -983,7 +987,8 @@
       "ordered": "Dipesan",
       "received": "Diterima",
       "rejected": "Dibatalkan"
-    }
+    },
+    "openApp": "Buka Gudang App"
   },
   "printReport": {
     "openBtn": "Cetak Laporan",

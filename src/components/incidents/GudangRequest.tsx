@@ -4,12 +4,13 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { Loader2, Package, Plus, Trash2 } from 'lucide-react'
+import { ExternalLink, Loader2, Package, Plus, Trash2, Warehouse } from 'lucide-react'
 import { toast } from 'sonner'
 import { useI18n } from '@/lib/i18n'
 
 type ItemRow = { name: string; part_no: string; qty: string; unit: string }
 const EMPTY_ROW: ItemRow = { name: '', part_no: '', qty: '', unit: 'pcs' }
+const GUDANG_APP_URL = process.env.NEXT_PUBLIC_GUDANG_APP_URL
 
 // Request spare parts / materials from the Gudang One warehouse system for
 // this incident. Collapsed by default; posts to /api/gudang/request which
@@ -70,9 +71,23 @@ export default function GudangRequest({ incidentId }: { incidentId: string }) {
 
   return (
     <div className="bg-white rounded-xl border border-emerald-200 p-4 space-y-3">
-      <div className="flex items-center gap-2 font-semibold text-gray-900">
-        <Package className="w-4 h-4 text-emerald-600" />
-        {t('gudang.title', '向倉庫叫料（Gudang One）')}
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2 font-semibold text-gray-900">
+          <Package className="w-4 h-4 text-emerald-600" />
+          {t('gudang.title', '向倉庫叫料（Gudang One）')}
+        </div>
+        {GUDANG_APP_URL && (
+          <a
+            href={GUDANG_APP_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 text-xs font-medium text-emerald-700 hover:text-emerald-800 shrink-0"
+          >
+            <Warehouse className="w-3.5 h-3.5" />
+            {t('gudang.openApp', '開啟 Gudang App')}
+            <ExternalLink className="w-3 h-3" />
+          </a>
+        )}
       </div>
 
       <div className="space-y-2">

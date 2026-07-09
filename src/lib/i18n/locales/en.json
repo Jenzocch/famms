@@ -38,7 +38,8 @@
     "noMatch": "No matching accounts",
     "showAllAccounts": "Show accounts from other factories ({count})",
     "showFactoryOnly": "Show this factory only",
-    "vendors": "Vendors"
+    "vendors": "Vendors",
+    "dueDateSupervisorOnly": "Due date is set by a supervisor"
   },
   "report": {
     "title": "Report Issue",
@@ -584,7 +585,10 @@
     "vendorNameRequired": "Please enter a vendor name",
     "vendorAdded": "Vendor added",
     "vendorConfirmDelete": "Remove this vendor?",
-    "vendorEmpty": "No vendors yet — add one above"
+    "vendorEmpty": "No vendors yet — add one above",
+    "telegramChatId": "Telegram Chat ID (optional)",
+    "telegramChatIdHint": "The employee gets this by DMing the bot /start on Telegram. Leave blank to skip.",
+    "telegramChatIdNeedsFactory": "Can't set this for a cross-factory account here — add it under Settings → Telegram personal notifications instead"
   },
   "telegram": {
     "configured": "Telegram bot configured (TELEGRAM_BOT_TOKEN active).",
@@ -983,7 +987,8 @@
       "ordered": "Ordered",
       "received": "Received",
       "rejected": "Cancelled"
-    }
+    },
+    "openApp": "Open Gudang App"
   },
   "printReport": {
     "openBtn": "Print Report",
