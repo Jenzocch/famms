@@ -315,19 +315,19 @@ export default function UserManager({ currentUserId }: { currentUserId: string }
               </div>
               <div className="flex gap-1 shrink-0">
                 <Button
-                  size="sm"
+                  size="icon"
                   variant="outline"
                   onClick={() => toggleActive(u)}
                   title={u.is_active ? t('settings.deactivate') : t('settings.activate')}
-                  className={u.is_active ? 'text-green-600' : 'text-gray-400'}
+                  className={`h-10 w-10 ${u.is_active ? 'text-green-600' : 'text-gray-400'}`}
                 >
                   <ShieldCheck className="w-4 h-4" />
                 </Button>
-                <Button size="sm" variant="outline" onClick={() => startEdit(u)}>
+                <Button size="icon" className="h-10 w-10" variant="outline" onClick={() => startEdit(u)}>
                   <Pencil className="w-4 h-4" />
                 </Button>
                 <Button
-                  size="sm"
+                  size="icon" className="h-10 w-10"
                   variant="outline"
                   onClick={() => remove(u)}
                   disabled={u.id === currentUserId}

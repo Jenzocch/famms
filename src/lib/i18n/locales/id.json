@@ -86,7 +86,8 @@
     "advancedOptions": "Opsi lanjutan (tenggat, opsional)",
     "sectionLocation": "Di Mana",
     "sectionIssue": "Apa Masalahnya",
-    "sectionUrgency": "Seberapa Mendesak"
+    "sectionUrgency": "Seberapa Mendesak",
+    "photoLimitDropped": "Maksimal {max} foto — {n} foto lebihnya dilewati"
   },
   "common": {
     "save": "Simpan",
@@ -1043,5 +1044,8 @@
     "machineHistory": "Kasus terbaru di mesin ini",
     "kbMatches": "Pengalaman terkait di knowledge base",
     "fixWas": "Cara perbaikan saat itu"
+  },
+  "offline": {
+    "banner": "Tidak ada koneksi — tampilan offline, kirim data setelah sinyal kembali"
   }
 }

@@ -48,6 +48,10 @@ export default function Sidebar({ profile, incidentBadge = 0 }: SidebarProps) {
   async function signOut() {
     await signOutAndClearCaches()
     router.push('/login')
+    // Purge Next's client Router Cache too — back/forward restores from it
+    // regardless of staleTimes, so without this the next user on a shared
+    // device could Back into the previous user's rendered pages.
+    router.refresh()
   }
 
   return (

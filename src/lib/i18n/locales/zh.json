@@ -86,7 +86,8 @@
     "advancedOptions": "進階選項（截止日，可不填）",
     "sectionLocation": "在哪裡",
     "sectionIssue": "什麼問題",
-    "sectionUrgency": "有多急"
+    "sectionUrgency": "有多急",
+    "photoLimitDropped": "最多 {max} 張，已略過多出的 {n} 張"
   },
   "common": {
     "save": "保存",
@@ -1043,5 +1044,8 @@
     "machineHistory": "這台機器最近的工單",
     "kbMatches": "知識庫相關經驗",
     "fixWas": "當時修法"
+  },
+  "offline": {
+    "banner": "沒有網路連線 — 顯示的是離線畫面，送出動作要等訊號恢復"
   }
 }

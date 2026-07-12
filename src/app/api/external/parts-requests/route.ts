@@ -40,6 +40,23 @@ export async function POST(req: Request) {
   if (external_ref !== undefined) update.external_ref = external_ref?.trim() || null
 
   const supabase = createAdminClient()
+
+  // Server-to-server webhooks get retried when the sender misses our response
+  // — make the write-back idempotent. If the status isn't actually changing,
+  // acknowledge without re-updating and (crucially) without re-notifying the
+  // technician "your part arrived" a second time.
+  const { data: before } = await supabase
+    .from('parts_requests')
+    .select('id, status')
+    .eq('id', request_id)
+    .maybeSingle()
+  if (!before) {
+    return NextResponse.json({ error: 'request not found' }, { status: 404 })
+  }
+  if (before.status === status) {
+    return NextResponse.json({ ok: true, request: before, unchanged: true })
+  }
+
   const { data, error } = await supabase
     .from('parts_requests')
     .update(update)

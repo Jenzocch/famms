@@ -86,7 +86,8 @@
     "advancedOptions": "Advanced (due date, optional)",
     "sectionLocation": "Where",
     "sectionIssue": "What's Wrong",
-    "sectionUrgency": "How Urgent"
+    "sectionUrgency": "How Urgent",
+    "photoLimitDropped": "Up to {max} photos — {n} extra were skipped"
   },
   "common": {
     "save": "Save",
@@ -1043,5 +1044,8 @@
     "machineHistory": "Recent cases on this machine",
     "kbMatches": "Related knowledge base entries",
     "fixWas": "Fix used"
+  },
+  "offline": {
+    "banner": "No connection — showing offline view; submits need signal back"
   }
 }

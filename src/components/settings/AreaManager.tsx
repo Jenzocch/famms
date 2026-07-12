@@ -236,7 +236,7 @@ export default function AreaManager() {
             </div>
             <div className="flex gap-2">
               <Button
-                size="sm"
+                size="icon" className="h-10 w-10"
                 variant="outline"
                 onClick={() => editArea(a)}
                 disabled={submitting}
@@ -244,7 +244,7 @@ export default function AreaManager() {
                 <Edit2 className="w-4 h-4" />
               </Button>
               <Button
-                size="sm"
+                size="icon" className="h-10 w-10"
                 variant="outline"
                 onClick={() => deleteArea(a.id)}
                 disabled={submitting}

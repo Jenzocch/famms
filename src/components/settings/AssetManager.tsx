@@ -154,7 +154,12 @@ export default function AssetManager() {
       resetForm()
       loadAssets()
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : t('settings.operationFailed'))
+      const isDupCode = !!err && typeof err === 'object' && 'code' in err && (err as { code: string }).code === '23505'
+      toast.error(
+        isDupCode
+          ? t('machineForm.dupCode', '此機器代碼在此工廠已被使用')
+          : err instanceof Error ? err.message : t('settings.operationFailed')
+      )
     } finally {
       setSubmitting(false)
     }
@@ -258,10 +263,10 @@ export default function AssetManager() {
                 </p>
               </div>
               <div className="flex gap-2">
-                <Button size="sm" variant="outline" onClick={() => startEdit(a)}>
+                <Button size="icon" className="h-10 w-10" variant="outline" onClick={() => startEdit(a)}>
                   <Pencil className="w-4 h-4" />
                 </Button>
-                <Button size="sm" variant="outline" onClick={() => remove(a.id)}>
+                <Button size="icon" className="h-10 w-10" variant="outline" onClick={() => remove(a.id)}>
                   <Trash2 className="w-4 h-4 text-red-600" />
                 </Button>
               </div>

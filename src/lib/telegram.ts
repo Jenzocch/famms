@@ -97,14 +97,6 @@ export function formatAssignment(args: {
   return lines.join('\n')
 }
 
-export function formatSLAAlert(args: { incidentNo: string; machineLabel: string; minutesLate: number }): string {
-  return [
-    `⏰ <b>SLA Terlewati</b> — ${esc(args.incidentNo)}`,
-    `🏭 Mesin: ${esc(args.machineLabel)}`,
-    `⚠️ Belum direspons, terlambat ${args.minutesLate} menit`,
-  ].join('\n')
-}
-
 export function formatBlocking(args: { incidentNo: string; reason: string }): string {
   return [
     `🛑 <b>Kasus Terblokir</b> — ${esc(args.incidentNo)}`,

@@ -67,7 +67,7 @@ export default function MachinesList({ machines, deleteAction, canManage = false
               <div className="flex gap-2">
                 <Button
                   variant="outline"
-                  size="sm"
+                  size="icon" className="h-10 w-10"
                   aria-label="QR"
                   onClick={() => router.push(`/machines/${m.id}/qr`)}
                 >
@@ -77,7 +77,7 @@ export default function MachinesList({ machines, deleteAction, canManage = false
                   <>
                     <Button
                       variant="outline"
-                      size="sm"
+                      size="icon" className="h-10 w-10"
                       aria-label={t('common.edit', '編輯')}
                       onClick={() => router.push(`/machines/${m.id}/edit`)}
                     >
@@ -129,11 +129,11 @@ function DeleteMachineButton({
   return (
     <Button
       variant="outline"
-      size="sm"
+      size="icon" className="h-10 w-10 text-red-600 hover:bg-red-50"
       onClick={onDelete}
       disabled={checking}
       aria-label={t('common.delete', '刪除')}
-      className="text-red-600 hover:bg-red-50"
+      
     >
       <Trash2 className="w-4 h-4" />
     </Button>

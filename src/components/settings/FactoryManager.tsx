@@ -165,7 +165,7 @@ export default function FactoryManager() {
             </div>
             <div className="flex gap-2">
               <Button
-                size="sm"
+                size="icon" className="h-10 w-10"
                 variant="outline"
                 onClick={() => editFactory(f)}
                 disabled={submitting}
@@ -173,7 +173,7 @@ export default function FactoryManager() {
                 <Edit2 className="w-4 h-4" />
               </Button>
               <Button
-                size="sm"
+                size="icon" className="h-10 w-10"
                 variant="outline"
                 onClick={() => deleteFactory(f.id)}
                 disabled={submitting}
