@@ -437,7 +437,8 @@
     "issueType": "问题类型",
     "addBtn": "新增機器",
     "empty": "尚未登錄任何機器",
-    "confirmDelete": "確定要刪除這台機器嗎？"
+    "confirmDelete": "確定要刪除這台機器嗎？",
+    "hasHistoryCannotDelete": "此機器有 {n} 筆維修紀錄，無法刪除。請改將狀態設為「報廢」以保留歷史。"
   },
   "dashboard": {
     "title": "仪表板",
@@ -590,7 +591,10 @@
     "vendorEmpty": "尚無廠商，點擊上方新增",
     "telegramChatId": "Telegram Chat ID（選填）",
     "telegramChatIdHint": "員工在 Telegram 私訊 bot 傳送 /start 取得。留空則不設定。",
-    "telegramChatIdNeedsFactory": "跨廠帳號無法在此設定，請至設定頁的 Telegram 個人通知新增"
+    "telegramChatIdNeedsFactory": "跨廠帳號無法在此設定，請至設定頁的 Telegram 個人通知新增",
+    "machineHasHistory": "此機器有維修紀錄，無法刪除。請改將狀態設為「報廢」以保留歷史。",
+    "areaHasMachines": "此區域還有 {n} 台機器，請先移除或搬移機器再刪除區域。",
+    "factoryHasAreas": "此工廠底下還有 {n} 個區域，請先清空區域與機器再刪除工廠。"
   },
   "telegram": {
     "configured": "Telegram Bot 已設定（TELEGRAM_BOT_TOKEN 已啟用）。",
@@ -865,7 +869,8 @@
     "remarks": "備註",
     "remarksPlaceholder": "關於機器的額外資訊...",
     "update": "更新機器",
-    "add": "新增機器"
+    "add": "新增機器",
+    "dupCode": "此機器代碼在此工廠已被使用"
   },
   "pmForm": {
     "firstDueDate": "首次預定日期",

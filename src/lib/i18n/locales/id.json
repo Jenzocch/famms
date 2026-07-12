@@ -437,7 +437,8 @@
     "issueType": "Jenis Masalah",
     "addBtn": "Tambah Mesin",
     "empty": "Belum ada mesin terdaftar",
-    "confirmDelete": "Hapus mesin ini?"
+    "confirmDelete": "Hapus mesin ini?",
+    "hasHistoryCannotDelete": "Mesin ini punya {n} catatan perbaikan dan tidak bisa dihapus. Ubah statusnya menjadi \"Scrapped\" agar riwayat tetap tersimpan."
   },
   "dashboard": {
     "title": "Dashboard",
@@ -590,7 +591,10 @@
     "vendorEmpty": "Belum ada vendor — tambahkan di atas",
     "telegramChatId": "Telegram Chat ID (opsional)",
     "telegramChatIdHint": "Karyawan dapatkan ini dengan chat /start ke bot Telegram. Kosongkan jika tidak perlu.",
-    "telegramChatIdNeedsFactory": "Tidak bisa diatur di sini untuk akun lintas pabrik — tambahkan lewat Pengaturan → Notifikasi personal Telegram"
+    "telegramChatIdNeedsFactory": "Tidak bisa diatur di sini untuk akun lintas pabrik — tambahkan lewat Pengaturan → Notifikasi personal Telegram",
+    "machineHasHistory": "Mesin ini punya riwayat perbaikan dan tidak bisa dihapus. Ubah statusnya menjadi \"Scrapped\" agar riwayat tetap tersimpan.",
+    "areaHasMachines": "Area ini masih punya {n} mesin. Pindahkan atau hapus mesinnya dulu sebelum menghapus area.",
+    "factoryHasAreas": "Pabrik ini masih punya {n} area. Kosongkan area dan mesinnya dulu sebelum menghapus pabrik."
   },
   "telegram": {
     "configured": "Bot Telegram terkonfigurasi (TELEGRAM_BOT_TOKEN aktif).",
@@ -865,7 +869,8 @@
     "remarks": "Catatan",
     "remarksPlaceholder": "Informasi tambahan tentang mesin...",
     "update": "Perbarui Mesin",
-    "add": "Tambah Mesin"
+    "add": "Tambah Mesin",
+    "dupCode": "Kode mesin ini sudah dipakai di pabrik ini"
   },
   "pmForm": {
     "firstDueDate": "Tanggal Jadwal Pertama",

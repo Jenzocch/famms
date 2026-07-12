@@ -118,6 +118,17 @@ export default function AreaManager() {
   }
 
   async function deleteArea(id: string) {
+    // Deleting an area used to cascade-wipe every machine in it plus all
+    // their history. Block it while machines remain — with a message that
+    // says WHY, not a raw FK error.
+    const { count } = await supabase
+      .from('machines')
+      .select('id', { count: 'exact', head: true })
+      .eq('area_id', id)
+    if ((count ?? 0) > 0) {
+      toast.error(t('settings.areaHasMachines', '此區域還有 {n} 台機器，請先移除或搬移機器再刪除區域。').replace('{n}', String(count)))
+      return
+    }
     if (!confirm(t('settings.confirmDeleteArea'))) return
     try {
       const { error } = await supabase.from('areas').delete().eq('id', id)

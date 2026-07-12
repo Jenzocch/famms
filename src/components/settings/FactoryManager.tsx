@@ -77,6 +77,17 @@ export default function FactoryManager() {
   }
 
   async function deleteFactory(id: string) {
+    // A factory with areas still under it can't be deleted — that cascade
+    // would take machines and their whole history with it. Explain instead
+    // of surfacing a raw FK error.
+    const { count } = await supabase
+      .from('areas')
+      .select('id', { count: 'exact', head: true })
+      .eq('factory_id', id)
+    if ((count ?? 0) > 0) {
+      toast.error(t('settings.factoryHasAreas', '此工廠底下還有 {n} 個區域，請先清空區域與機器再刪除工廠。').replace('{n}', String(count)))
+      return
+    }
     if (!confirm(t('settings.confirmDeleteFactory'))) return
     try {
       const { error } = await supabase.from('factories').delete().eq('id', id)

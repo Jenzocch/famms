@@ -161,6 +161,17 @@ export default function AssetManager() {
   }
 
   async function remove(id: string) {
+    // A machine with repair history must be scrapped, not deleted — the DB
+    // (migration_delete_protection) would RESTRICT it anyway; check first so
+    // the user gets a real explanation instead of a raw FK error.
+    const { count } = await supabase
+      .from('incidents')
+      .select('id', { count: 'exact', head: true })
+      .eq('machine_id', id)
+    if ((count ?? 0) > 0) {
+      toast.error(t('settings.machineHasHistory', '此機器有維修紀錄，無法刪除。請改將狀態設為「報廢」以保留歷史。').replace('{n}', String(count)))
+      return
+    }
     if (!confirm(t('settings.confirmDeleteAsset'))) return
     const { error } = await supabase.from('machines').delete().eq('id', id)
     if (error) { toast.error(error.message); return }
