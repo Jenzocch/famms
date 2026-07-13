@@ -540,7 +540,7 @@ export const DOWNTIME_IMPACT_LABELS: Record<DowntimeImpact, string> = {
 };
 
 export const ROLE_LABELS: Record<UserRole, string> = {
-  technician: 'Teknisi',
+  technician: 'Karyawan',
   supervisor: 'Pengawas',
   manager: 'Manajer',
   director: 'Kepala Pabrik',

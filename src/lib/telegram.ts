@@ -163,7 +163,11 @@ const TYPE_TO_FLAG: Partial<Record<NotificationType, GroupFlag>> = {
 
 export async function notifyFactory(
   supabase: SupabaseClient,
-  args: { factoryId: string; type: NotificationType; html: string }
+  // factoryId may be null: an incident that isn't tied to one factory. In that
+  // case only the shared (factory_id NULL) groups/users apply — passing null
+  // into `.eq`/`.or` string filters would build `factory_id.eq.null`, which
+  // PostgREST tries to cast to UUID and errors on, killing the whole send.
+  args: { factoryId: string | null; type: NotificationType; html: string }
 ): Promise<{ sent: number; failed: number }> {
   if (!TOKEN) return { sent: 0, failed: 0 }
 
@@ -171,11 +175,15 @@ export async function notifyFactory(
   let sent = 0
   let failed = 0
 
-  // Groups subscribed to this notification type
+  // Groups subscribed to this notification type — factory_id NULL means "all
+  // factories" (e.g. one shared office group), always included; a specific
+  // factory also gets its own groups.
   let groupQuery = supabase
     .from('telegram_groups')
     .select('id, telegram_group_id')
-    .eq('factory_id', args.factoryId)
+  groupQuery = args.factoryId
+    ? groupQuery.or(`factory_id.eq.${args.factoryId},factory_id.is.null`)
+    : groupQuery.is('factory_id', null)
   if (flag) groupQuery = groupQuery.eq(flag, true)
   const { data: groups } = await groupQuery
 
@@ -191,12 +199,16 @@ export async function notifyFactory(
     r.ok ? sent++ : failed++
   }
 
-  // Individually opted-in users
-  const { data: users } = await supabase
+  // Individually opted-in users (shared NULL-factory registrations always
+  // apply; a specific factory also gets its own).
+  let userQuery = supabase
     .from('telegram_users')
     .select('id, telegram_chat_id')
-    .eq('factory_id', args.factoryId)
     .eq('notification_enabled', true)
+  userQuery = args.factoryId
+    ? userQuery.or(`factory_id.eq.${args.factoryId},factory_id.is.null`)
+    : userQuery.is('factory_id', null)
+  const { data: users } = await userQuery
 
   for (const u of users ?? []) {
     const r = await sendTelegramMessage(u.telegram_chat_id, args.html)

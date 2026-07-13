@@ -425,7 +425,7 @@ export default function PMScheduleManager() {
                     onClick={() => setAssignees(prev => Array.from(new Set([...prev, ...factoryTechnicians.map(a => a.id)])))}
                     className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-700"
                   >
-                    <Users className="w-3.5 h-3.5" /> {t('assign.allTechnicians', '指派給全部技師')} ({factoryTechnicians.length})
+                    <Users className="w-3.5 h-3.5" /> {t('assign.allTechnicians', '指派給全部一般員工')} ({factoryTechnicians.length})
                   </button>
                 )}
                 {assignees.length > 0 && (

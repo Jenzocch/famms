@@ -5,7 +5,7 @@ import type { IncidentStatus, UserRole } from '@/types'
 
 // Chinese role labels (UI is Chinese; underlying roles unchanged)
 export const ROLE_ZH: Record<UserRole, string> = {
-  technician: '技師',
+  technician: '一般員工',
   supervisor: '主管',
   manager: '經理',
   director: '廠長',

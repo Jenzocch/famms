@@ -9,10 +9,10 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select'
 import { toast } from 'sonner'
-import { Loader2, Trash2, Plus, Pencil } from 'lucide-react'
+import { Loader2, Trash2, Plus, Pencil, Archive } from 'lucide-react'
 import { useI18n } from '@/lib/i18n'
+import { useFactories } from '@/lib/useFactories'
 
-interface Factory { id: string; name: string }
 interface Area { id: string; factory_id: string; name: string }
 interface Asset {
   id: string
@@ -37,10 +37,11 @@ export default function AssetManager() {
     const c = CATEGORIES.find(c => c.value === value)
     return c ? t(c.labelKey, c.label) : ''
   }
-  const [factories, setFactories] = useState<Factory[]>([])
+  // Shared factory cache — reflects renames/adds from FactoryManager without a
+  // page reload (its own on-mount fetch went stale after an edit).
+  const { factories, loading: factoriesLoading } = useFactories()
   const [areas, setAreas] = useState<Area[]>([])
   const [assets, setAssets] = useState<Asset[]>([])
-  const [loading, setLoading] = useState(true)
 
   const [factoryId, setFactoryId] = useState('')
   const [areaId, setAreaId] = useState('')
@@ -51,13 +52,14 @@ export default function AssetManager() {
   const [code, setCode] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
+  // Preselect the first factory once the shared list arrives (and keep the
+  // selection valid if the current one disappears, e.g. after a delete).
   useEffect(() => {
-    supabase.from('factories').select('id, name').order('name').then(({ data }) => {
-      setFactories(data ?? [])
-      if (data && data.length > 0) setFactoryId(data[0].id)
-      setLoading(false)
-    })
-  }, [])
+    if (factories.length === 0) return
+    if (!factoryId || !factories.some(f => f.id === factoryId)) {
+      setFactoryId(factories[0].id)
+    }
+  }, [factories])
 
   useEffect(() => {
     if (!factoryId) { setAreas([]); setAreaId(''); return }
@@ -174,17 +176,38 @@ export default function AssetManager() {
       .select('id', { count: 'exact', head: true })
       .eq('machine_id', id)
     if ((count ?? 0) > 0) {
-      toast.error(t('settings.machineHasHistory', '此機器有維修紀錄，無法刪除。請改將狀態設為「報廢」以保留歷史。').replace('{n}', String(count)))
+      toast.error(t('settings.machineHasHistory', '此機器有維修紀錄，無法刪除。請改按「報廢」以保留歷史。').replace('{n}', String(count)))
       return
     }
     if (!confirm(t('settings.confirmDeleteAsset'))) return
     const { error } = await supabase.from('machines').delete().eq('id', id)
-    if (error) { toast.error(error.message); return }
+    if (error) {
+      // Incidents was clear, but the DB RESTRICT also guards PM schedules, QR
+      // codes, costs, etc. Any of those turns delete into a raw FK error —
+      // point the user at 報廢 instead of showing the Postgres message.
+      const isFk = typeof error === 'object' && 'code' in error && (error as { code: string }).code === '23503'
+      toast.error(isFk
+        ? t('settings.machineHasLinks', '此機器已被其他紀錄（保養排程、QR 等）引用，無法刪除。請改按「報廢」。')
+        : error.message)
+      return
+    }
     toast.success(t('settings.deleted'))
     loadAssets()
   }
 
-  if (loading) return <div className="text-center text-gray-500 text-sm">{t('settings.loading')}</div>
+  // Retire a machine that can't be deleted (has history/links). Sets status
+  // 'scrapped', which drops it from every picker and list (all queries filter
+  // scrapped out) while keeping its history intact — the intended path the
+  // delete guard keeps pointing at, now actually available here.
+  async function scrap(id: string, name: string) {
+    if (!confirm(t('settings.confirmScrapAsset', '確定將「{name}」設為報廢？它會從所有列表與選單消失，但維修歷史會保留。').replace('{name}', name))) return
+    const { error } = await supabase.from('machines').update({ status: 'scrapped' }).eq('id', id)
+    if (error) { toast.error(error.message); return }
+    toast.success(t('settings.scrapped', '已設為報廢'))
+    loadAssets()
+  }
+
+  if (factoriesLoading) return <div className="text-center text-gray-500 text-sm">{t('settings.loading')}</div>
 
   return (
     <div className="space-y-4">
@@ -207,6 +230,15 @@ export default function AssetManager() {
         <Button onClick={startAdd} className="gap-2 w-full">
           <Plus className="w-4 h-4" /> {t('settings.addAsset')}
         </Button>
+      )}
+
+      {/* No areas under this factory → the add button can't show (a machine
+          needs an area). Say why instead of just hiding it, which read as
+          "adding assets is broken". */}
+      {!showForm && factoryId && areas.length === 0 && (
+        <p className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg p-3">
+          {t('settings.noAreaAddFirst', '此工廠尚無區域，請先到「工廠與區域管理」新增區域，才能在此新增機器/項目。')}
+        </p>
       )}
 
       {showForm && (
@@ -265,6 +297,13 @@ export default function AssetManager() {
               <div className="flex gap-2">
                 <Button size="icon" className="h-10 w-10" variant="outline" onClick={() => startEdit(a)}>
                   <Pencil className="w-4 h-4" />
+                </Button>
+                <Button
+                  size="icon" className="h-10 w-10" variant="outline"
+                  onClick={() => scrap(a.id, a.machine_name)}
+                  title={t('settings.scrapAsset', '報廢（保留歷史，從列表移除）')}
+                >
+                  <Archive className="w-4 h-4 text-amber-600" />
                 </Button>
                 <Button size="icon" className="h-10 w-10" variant="outline" onClick={() => remove(a.id)}>
                   <Trash2 className="w-4 h-4 text-red-600" />
