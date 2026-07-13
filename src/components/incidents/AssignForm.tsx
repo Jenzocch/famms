@@ -222,7 +222,7 @@ export default function AssignForm({
       // Warn the assigner instead of a plain success, so a work order doesn't
       // silently vanish from every technician's board.
       if (selectedIds.length === 0) {
-        toast.warning(t('assign.savedNoInternal', '已儲存，但未指派任何內部帳號 — 技師將看不到此工單，只有主管看得到'))
+        toast.warning(t('assign.savedNoInternal', '已儲存，但未指派任何內部帳號 — 一般員工將看不到此工單，只有主管看得到'))
       } else {
         toast.success(t('assign.saved', '派工已更新'))
       }
@@ -256,7 +256,7 @@ export default function AssignForm({
                   className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-700"
                 >
                   <Users className="w-3.5 h-3.5" />
-                  {t('assign.allTechnicians', '指派給全部技師')} ({factoryTechnicians.length})
+                  {t('assign.allTechnicians', '指派給全部一般員工')} ({factoryTechnicians.length})
                 </button>
               )}
               {customRoleGroups.map(({ role, members }) => (

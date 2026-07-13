@@ -18,7 +18,7 @@ import {
 import { useI18n } from '@/lib/i18n'
 
 const BASE_ROLE_LABEL: Record<UserRole, string> = {
-  technician: '技師 (technician)',
+  technician: '一般員工 (technician)',
   supervisor: '主管 (supervisor)',
   manager: '經理 (manager)',
   director: '廠長 (director)',

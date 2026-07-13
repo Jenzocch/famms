@@ -22,7 +22,7 @@
   "assign": {
     "title": "派工指派",
     "assignees": "負責人（可多選）",
-    "allTechnicians": "指派給全部技師",
+    "allTechnicians": "指派給全部一般員工",
     "allCustomRole": "指派給{role}",
     "clearAll": "取消全部",
     "noAccounts": "尚無可指派的帳號",
@@ -42,7 +42,7 @@
     "vendors": "常用廠商",
     "dueDateSupervisorOnly": "完成日由主管設定",
     "confirmClearAll": "確定要清空所有指派嗎？被指派中的人員將無法再看到此工單。",
-    "savedNoInternal": "已儲存，但未指派任何內部帳號 — 技師將看不到此工單，只有主管看得到",
+    "savedNoInternal": "已儲存，但未指派任何內部帳號 — 一般員工將看不到此工單，只有主管看得到",
     "sectionHint": "選誰來處理這張工單，可以多選"
   },
   "report": {
@@ -124,7 +124,7 @@
     "machines": "機器"
   },
   "roles": {
-    "technician": "技師",
+    "technician": "一般員工",
     "supervisor": "主管",
     "manager": "經理",
     "director": "廠長",

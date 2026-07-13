@@ -22,7 +22,7 @@
   "assign": {
     "title": "Penugasan",
     "assignees": "Penanggung jawab (pilih banyak)",
-    "allTechnicians": "Tugaskan ke semua teknisi",
+    "allTechnicians": "Tugaskan semua karyawan",
     "allCustomRole": "Tugaskan semua {role}",
     "clearAll": "Hapus semua",
     "noAccounts": "Belum ada akun yang bisa ditugaskan",
@@ -42,7 +42,7 @@
     "vendors": "Vendor",
     "dueDateSupervisorOnly": "Tenggat ditetapkan oleh supervisor",
     "confirmClearAll": "Hapus semua petugas? Orang yang saat ini ditugaskan tidak akan bisa melihat laporan ini lagi.",
-    "savedNoInternal": "Tersimpan, tetapi tidak ada akun internal yang ditugaskan — teknisi tidak akan melihat laporan ini, hanya supervisor",
+    "savedNoInternal": "Tersimpan, tapi tidak ada akun internal — karyawan tidak akan melihat laporan ini, hanya pengawas",
     "sectionHint": "Pilih siapa yang menangani laporan ini, bisa pilih beberapa orang"
   },
   "report": {
@@ -124,7 +124,7 @@
     "machines": "Mesin"
   },
   "roles": {
-    "technician": "Teknisi",
+    "technician": "Karyawan",
     "supervisor": "Supervisor",
     "manager": "Manajer",
     "director": "Direktur",
