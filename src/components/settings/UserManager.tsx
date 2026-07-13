@@ -9,7 +9,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select'
 import { toast } from 'sonner'
-import { Loader2, Trash2, Plus, Pencil, ShieldCheck, KeyRound, Send } from 'lucide-react'
+import { Loader2, Trash2, Plus, Pencil, CircleCheck, CircleX, KeyRound, Send } from 'lucide-react'
 import { ROLE_ZH } from '@/lib/incident-display'
 import type { UserRole } from '@/types'
 import type { CustomRole } from '@/lib/roles'
@@ -370,9 +370,9 @@ export default function UserManager({ currentUserId }: { currentUserId: string }
                   variant="outline"
                   onClick={() => toggleActive(u)}
                   title={u.is_active ? t('settings.deactivate') : t('settings.activate')}
-                  className={`h-10 w-10 ${u.is_active ? 'text-green-600' : 'text-gray-400'}`}
+                  className={`h-10 w-10 ${u.is_active ? 'text-green-600' : 'text-red-500'}`}
                 >
-                  <ShieldCheck className="w-4 h-4" />
+                  {u.is_active ? <CircleCheck className="w-4 h-4" /> : <CircleX className="w-4 h-4" />}
                 </Button>
                 <Button size="icon" className="h-10 w-10" variant="outline" onClick={() => startEdit(u)}>
                   <Pencil className="w-4 h-4" />
