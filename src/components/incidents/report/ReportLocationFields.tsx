@@ -93,13 +93,18 @@ export default function ReportLocationFields({
         </Select>
       )}
 
-      {/* Free-text "other" location — for spots not in the lists above */}
-      <Input
-        value={locationNote}
-        onChange={e => setLocationNote(e.target.value)}
-        placeholder={t('report.locationOther', '其他位置（自行填寫，選填）')}
-        className="mt-1"
-      />
+      {/* Free-text "other" location — for spots not in the lists above.
+          Hidden while the "__other__" area option is active: that input above
+          binds the SAME locationNote value, and showing both looked like two
+          mysteriously self-filling fields. */}
+      {areaId !== '__other__' && (
+        <Input
+          value={locationNote}
+          onChange={e => setLocationNote(e.target.value)}
+          placeholder={t('report.locationOther', '其他位置（自行填寫，選填）')}
+          className="mt-1"
+        />
+      )}
     </div>
   )
 }
