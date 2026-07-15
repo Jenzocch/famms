@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { sendTelegramMessage, answerCallbackQuery, downloadTelegramFile, incidentActionButtons, isTelegramConfigured, esc } from '@/lib/telegram'
+import {
+  sendTelegramMessage, answerCallbackQuery, editMessageKeyboard, downloadTelegramFile,
+  incidentActionButtons, incidentActionButtonsAfter, isTelegramConfigured, esc,
+} from '@/lib/telegram'
 import { logAuditEvent } from '@/lib/audit'
 import type { IncidentStatus } from '@/types'
 
@@ -54,10 +57,19 @@ async function resolveProfile(admin: ReturnType<typeof createAdminClient>, chatI
 async function handleStatusButton(admin: ReturnType<typeof createAdminClient>, cq: {
   id: string
   from?: { id?: number }
-  message?: { chat?: { id?: number } }
+  message?: { chat?: { id?: number }; message_id?: number }
   data?: string
 }) {
   const chatId = cq.from?.id ?? cq.message?.chat?.id
+  const messageId = cq.message?.message_id
+
+  // The already-done button on a rewritten keyboard is inert by design
+  // (callback_data 'noop') — just clear the spinner, no state change.
+  if (cq.data === 'noop') {
+    await answerCallbackQuery(cq.id)
+    return
+  }
+
   const [, incidentId, target] = (cq.data ?? '').split('|')
   if (!chatId || !incidentId || !BUTTON_TARGETS.includes(target as IncidentStatus)) {
     await answerCallbackQuery(cq.id)
@@ -133,12 +145,50 @@ async function handleStatusButton(admin: ReturnType<typeof createAdminClient>, c
   })
 
   await answerCallbackQuery(cq.id, '✅ Status diperbarui')
+
+  // Rewrite the ORIGINAL message's buttons so the tap is visibly registered
+  // there — without this, the buttons look untouched and a technician can't
+  // tell from the message itself whether their tap went through.
+  if (messageId) {
+    await editMessageKeyboard(chatId, messageId, incidentActionButtonsAfter(incidentId, target as 'repairing' | 'testing'))
+  }
+
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
   await sendTelegramMessage(chatId, [
     `✅ <b>${esc(incident.incident_no)}</b> → ${esc(STATUS_LABEL_ID[target] ?? target)}`,
     'Balas pesan ini untuk menambah catatan pekerjaan (opsional).',
     `<a href="${appUrl}/incidents/${incidentId}">Lihat kasus →</a>`,
   ].join('\n'))
+}
+
+// "📝 Tambah catatan / foto" tapped: send a force_reply prompt so the client
+// auto-opens the keyboard pinned to THIS message — the user just types/sends
+// a photo, no need to know Telegram's long-press-to-reply gesture. The
+// prompt's own text carries the FIT- number so handleReplyNote's regex match
+// keeps working on it exactly like a reply to the original assignment DM.
+async function handleNoteButton(admin: ReturnType<typeof createAdminClient>, cq: {
+  id: string
+  from?: { id?: number }
+  message?: { chat?: { id?: number } }
+  data?: string
+}) {
+  const chatId = cq.from?.id ?? cq.message?.chat?.id
+  const [, incidentId] = (cq.data ?? '').split('|')
+  if (!chatId || !incidentId) { await answerCallbackQuery(cq.id); return }
+
+  const { data: incident } = await admin
+    .from('incidents')
+    .select('incident_no')
+    .eq('id', incidentId)
+    .maybeSingle()
+  await answerCallbackQuery(cq.id)
+  if (!incident) return
+
+  await sendTelegramMessage(
+    chatId,
+    `📝 Ketik catatan untuk <b>${esc(incident.incident_no)}</b> di bawah ini (boleh sertakan foto):`,
+    { force_reply: true, input_field_placeholder: 'Catatan pekerjaan…' }
+  )
 }
 
 // A reply to one of the bot's incident messages → progress note, with photos
@@ -232,10 +282,15 @@ export async function POST(req: Request) {
 
   const update = await req.json().catch(() => null)
 
-  // Status button tapped on an assignment/reminder DM
+  // Button tapped on an assignment/reminder DM — dispatch by callback_data prefix
   if (update?.callback_query) {
     const admin = createAdminClient()
-    await handleStatusButton(admin, update.callback_query)
+    const data: string = update.callback_query.data ?? ''
+    if (data.startsWith('note|')) {
+      await handleNoteButton(admin, update.callback_query)
+    } else {
+      await handleStatusButton(admin, update.callback_query)
+    }
     return NextResponse.json({ ok: true })
   }
 
