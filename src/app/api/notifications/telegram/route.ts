@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { sendTelegramMessage, answerCallbackQuery, downloadTelegramFile, isTelegramConfigured, esc } from '@/lib/telegram'
+import { sendTelegramMessage, answerCallbackQuery, downloadTelegramFile, incidentActionButtons, isTelegramConfigured, esc } from '@/lib/telegram'
 import { logAuditEvent } from '@/lib/audit'
 import type { IncidentStatus } from '@/types'
 
@@ -262,6 +262,38 @@ export async function POST(req: Request) {
           'Berikan ID ini ke admin untuk mengaktifkan notifikasi insiden.',
         ].join('\n')
     await sendTelegramMessage(chatId, reply)
+    return NextResponse.json({ ok: true })
+  }
+
+  // /tugas — re-send the technician's open assigned cases, one message per
+  // case with its own status buttons. The answer to "the assignment message
+  // scrolled away, which one do I tap?": pull them all up fresh.
+  if (!isGroup && (text.startsWith('/tugas') || text.startsWith('/tasks'))) {
+    const admin = createAdminClient()
+    const profile = await resolveProfile(admin, chatId)
+    if (!profile) {
+      await sendTelegramMessage(chatId, 'Chat ID Anda belum terdaftar di FAMMS — hubungi admin.')
+      return NextResponse.json({ ok: true })
+    }
+    const { data: cases } = await admin
+      .from('incidents')
+      .select('id, incident_no, title, incident_type, status, due_date')
+      .contains('assigned_user_ids', [profile.id])
+      .neq('status', 'closed')
+      .order('updated_at', { ascending: false })
+      .limit(5)
+    if (!cases || cases.length === 0) {
+      await sendTelegramMessage(chatId, '✅ Tidak ada tugas aktif saat ini.')
+      return NextResponse.json({ ok: true })
+    }
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+    for (const c of cases) {
+      await sendTelegramMessage(chatId, [
+        `🔧 <b>${esc(c.incident_no)}</b> — ${esc(c.title || c.incident_type)}`,
+        `Status: ${esc(c.status)}${c.due_date ? ` · Target: ${esc(c.due_date)}` : ''}`,
+        `<a href="${appUrl}/incidents/${c.id}">Lihat kasus →</a>`,
+      ].join('\n'), incidentActionButtons(c.id))
+    }
     return NextResponse.json({ ok: true })
   }
 
