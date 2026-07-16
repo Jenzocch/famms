@@ -74,6 +74,39 @@ SET file_size_limit = 10485760, -- 10 MB
     allowed_mime_types = ARRAY['image/jpeg', 'image/png', 'image/webp']
 WHERE id = 'incident-photos';
 
+-- ---------------------------------------------------------------------------
+-- INCIDENTS — machine must belong to the incident's own factory
+-- ---------------------------------------------------------------------------
+-- RLS's incidents_ins/upd policies only check factory_id is one you can
+-- access — nothing enforced that machine_id actually BELONGS to that
+-- factory_id. Every app write path (report form, edit form, Telegram /lapor)
+-- happened to only ever offer factory-matched machines through their own UI,
+-- but nothing stopped a direct API/devtools call from pointing factory_id at
+-- one factory and machine_id at another factory's machine — polluting that
+-- machine's fault history, health score, and KPIs with fabricated incidents.
+-- One trigger closes the gap for every write path at once, present and
+-- future, instead of patching each call site individually.
+CREATE OR REPLACE FUNCTION enforce_incident_machine_factory()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  IF NEW.machine_id IS NOT NULL THEN
+    IF NOT EXISTS (
+      SELECT 1 FROM machines WHERE id = NEW.machine_id AND factory_id = NEW.factory_id
+    ) THEN
+      RAISE EXCEPTION 'machine_id % does not belong to factory_id %', NEW.machine_id, NEW.factory_id;
+    END IF;
+  END IF;
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS incidents_machine_factory_guard ON incidents;
+CREATE TRIGGER incidents_machine_factory_guard
+  BEFORE INSERT OR UPDATE OF machine_id, factory_id ON incidents
+  FOR EACH ROW EXECUTE FUNCTION enforce_incident_machine_factory();
+
 -- Marks a login as a SHARED DEVICE account (e.g. one tablet logged in
 -- permanently and handed between several technicians) rather than one
 -- person's own login. The report form auto-fills "回報人" from whoever is
