@@ -75,6 +75,11 @@ CREATE TABLE IF NOT EXISTS telegram_report_drafts (
   photo_file_id TEXT,
   created_at   TIMESTAMP DEFAULT NOW()
 );
+-- Cross-factory accounts (no single profiles.factory_id) have to pick which
+-- factory a report belongs to — this holds that pick across the extra step.
+-- NULL until chosen; single-factory accounts skip the picker and this gets
+-- set to their one factory immediately.
+ALTER TABLE telegram_report_drafts ADD COLUMN IF NOT EXISTS factory_id UUID REFERENCES factories(id);
 
 -- Reference photo so a reporter can tell areas apart at a glance in the
 -- report form (e.g. two areas both named "Line 2"). One photo per area is
@@ -330,4 +335,7 @@ UNION ALL SELECT 'incidents.photo_count',
                WHERE table_name='incidents' AND column_name='photo_count')
 UNION ALL SELECT 'profiles.is_shared_device',
        EXISTS (SELECT 1 FROM information_schema.columns
-               WHERE table_name='profiles' AND column_name='is_shared_device');
+               WHERE table_name='profiles' AND column_name='is_shared_device')
+UNION ALL SELECT 'telegram_report_drafts.factory_id',
+       EXISTS (SELECT 1 FROM information_schema.columns
+               WHERE table_name='telegram_report_drafts' AND column_name='factory_id');
