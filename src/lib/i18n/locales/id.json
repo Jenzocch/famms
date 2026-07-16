@@ -733,6 +733,8 @@
     "heading": "Papan Laporan",
     "noIncidents": "Tidak ada laporan",
     "unassigned": "Belum ditugaskan",
+    "allFactories": "Semua pabrik",
+    "noFactory": "Pabrik belum diatur",
     "photos": "foto",
     "problem": "Masalah",
     "overdue": "Terlambat",

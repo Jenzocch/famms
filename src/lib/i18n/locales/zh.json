@@ -733,6 +733,8 @@
     "heading": "工單看板",
     "noIncidents": "沒有工單",
     "unassigned": "未指派",
+    "allFactories": "全部工廠",
+    "noFactory": "未設定工廠",
     "photos": "張照片",
     "problem": "問題",
     "overdue": "逾期",

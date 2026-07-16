@@ -733,6 +733,8 @@
     "heading": "Work Orders",
     "noIncidents": "No work orders",
     "unassigned": "Unassigned",
+    "allFactories": "All factories",
+    "noFactory": "No factory set",
     "photos": "photos",
     "problem": "Issue",
     "overdue": "Overdue",
