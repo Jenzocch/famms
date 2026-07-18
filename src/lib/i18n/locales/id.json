@@ -591,6 +591,7 @@
     "deactivated": "Dinonaktifkan",
     "activated": "Diaktifkan",
     "cannotDeleteSelf": "Anda tidak dapat menghapus akun sendiri",
+    "systemAdminProtected": "Tidak berwenang mengubah akun System Admin",
     "confirmDeleteUser": "Hapus akun {email}? Tindakan ini tidak dapat dibatalkan.",
     "userDeleted": "Akun dihapus",
     "noUsers": "Belum ada akun",

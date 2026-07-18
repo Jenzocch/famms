@@ -591,6 +591,7 @@
     "deactivated": "已停用",
     "activated": "已啟用",
     "cannotDeleteSelf": "無法刪除自己的帳號",
+    "systemAdminProtected": "無權限操作系統管理員帳號",
     "confirmDeleteUser": "確認刪除帳號 {email}？此動作無法復原。",
     "userDeleted": "已刪除帳號",
     "noUsers": "尚無帳號",
